@@ -1,0 +1,2212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown Editor Pro</title>
+    
+    <!-- Marked.js for Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Highlight.js for code syntax highlighting -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css" id="hljs-theme">
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/highlight.min.js"></script>
+    <!-- Mermaid.js for diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <!-- html2canvas for PNG export -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+JP:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* Light Theme */
+            --bg-primary: #fafafa;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f0f0f0;
+            --text-primary: #1a1a2e;
+            --text-secondary: #4a4a5a;
+            --text-muted: #8a8a9a;
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
+            --accent-light: rgba(99, 102, 241, 0.1);
+            --border: #e0e0e0;
+            --shadow: rgba(0, 0, 0, 0.08);
+            --divider: #d0d0d0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --toolbar-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --editor-bg: #ffffff;
+            --preview-bg: #fefefe;
+            --code-bg: #f6f8fa;
+            --scrollbar-track: #f0f0f0;
+            --scrollbar-thumb: #c0c0c0;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0f0f1a;
+            --bg-secondary: #1a1a2e;
+            --bg-tertiary: #252540;
+            --text-primary: #e8e8f0;
+            --text-secondary: #b0b0c0;
+            --text-muted: #6a6a7a;
+            --accent: #818cf8;
+            --accent-hover: #a5b4fc;
+            --accent-light: rgba(129, 140, 248, 0.15);
+            --border: #2a2a40;
+            --shadow: rgba(0, 0, 0, 0.3);
+            --divider: #3a3a50;
+            --toolbar-bg: linear-gradient(135deg, #1e1e3f 0%, #2d1b4e 100%);
+            --editor-bg: #12121f;
+            --preview-bg: #16162a;
+            --code-bg: #1e1e2e;
+            --scrollbar-track: #1a1a2e;
+            --scrollbar-thumb: #3a3a50;
+        }
+
+        /* Color Themes */
+        [data-color="indigo"] {
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
+            --accent-light: rgba(99, 102, 241, 0.1);
+            --toolbar-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        [data-theme="dark"][data-color="indigo"] {
+            --accent: #818cf8;
+            --accent-hover: #a5b4fc;
+            --accent-light: rgba(129, 140, 248, 0.15);
+            --toolbar-bg: linear-gradient(135deg, #1e1e3f 0%, #2d1b4e 100%);
+        }
+
+        [data-color="blue"] {
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: rgba(59, 130, 246, 0.1);
+            --toolbar-bg: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        }
+        [data-theme="dark"][data-color="blue"] {
+            --accent: #60a5fa;
+            --accent-hover: #93c5fd;
+            --accent-light: rgba(96, 165, 250, 0.15);
+            --toolbar-bg: linear-gradient(135deg, #1e3a5f 0%, #1e40af 100%);
+        }
+
+        [data-color="emerald"] {
+            --accent: #10b981;
+            --accent-hover: #059669;
+            --accent-light: rgba(16, 185, 129, 0.1);
+            --toolbar-bg: linear-gradient(135deg, #10b981 0%, #047857 100%);
+        }
+        [data-theme="dark"][data-color="emerald"] {
+            --accent: #34d399;
+            --accent-hover: #6ee7b7;
+            --accent-light: rgba(52, 211, 153, 0.15);
+            --toolbar-bg: linear-gradient(135deg, #064e3b 0%, #047857 100%);
+        }
+
+        [data-color="rose"] {
+            --accent: #f43f5e;
+            --accent-hover: #e11d48;
+            --accent-light: rgba(244, 63, 94, 0.1);
+            --toolbar-bg: linear-gradient(135deg, #f43f5e 0%, #be123c 100%);
+        }
+        [data-theme="dark"][data-color="rose"] {
+            --accent: #fb7185;
+            --accent-hover: #fda4af;
+            --accent-light: rgba(251, 113, 133, 0.15);
+            --toolbar-bg: linear-gradient(135deg, #4c0519 0%, #9f1239 100%);
+        }
+
+        [data-color="amber"] {
+            --accent: #f59e0b;
+            --accent-hover: #d97706;
+            --accent-light: rgba(245, 158, 11, 0.1);
+            --toolbar-bg: linear-gradient(135deg, #f59e0b 0%, #b45309 100%);
+        }
+        [data-theme="dark"][data-color="amber"] {
+            --accent: #fbbf24;
+            --accent-hover: #fcd34d;
+            --accent-light: rgba(251, 191, 36, 0.15);
+            --toolbar-bg: linear-gradient(135deg, #451a03 0%, #92400e 100%);
+        }
+
+        [data-color="cyan"] {
+            --accent: #06b6d4;
+            --accent-hover: #0891b2;
+            --accent-light: rgba(6, 182, 212, 0.1);
+            --toolbar-bg: linear-gradient(135deg, #06b6d4 0%, #0e7490 100%);
+        }
+        [data-theme="dark"][data-color="cyan"] {
+            --accent: #22d3ee;
+            --accent-hover: #67e8f9;
+            --accent-light: rgba(34, 211, 238, 0.15);
+            --toolbar-bg: linear-gradient(135deg, #083344 0%, #0e7490 100%);
+        }
+
+        [data-color="violet"] {
+            --accent: #8b5cf6;
+            --accent-hover: #7c3aed;
+            --accent-light: rgba(139, 92, 246, 0.1);
+            --toolbar-bg: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+        }
+        [data-theme="dark"][data-color="violet"] {
+            --accent: #a78bfa;
+            --accent-hover: #c4b5fd;
+            --accent-light: rgba(167, 139, 250, 0.15);
+            --toolbar-bg: linear-gradient(135deg, #2e1065 0%, #5b21b6 100%);
+        }
+
+        [data-color="slate"] {
+            --accent: #64748b;
+            --accent-hover: #475569;
+            --accent-light: rgba(100, 116, 139, 0.1);
+            --toolbar-bg: linear-gradient(135deg, #64748b 0%, #334155 100%);
+        }
+        [data-theme="dark"][data-color="slate"] {
+            --accent: #94a3b8;
+            --accent-hover: #cbd5e1;
+            --accent-light: rgba(148, 163, 184, 0.15);
+            --toolbar-bg: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--scrollbar-track);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb);
+            border-radius: 5px;
+            transition: background 0.2s ease;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
+        }
+
+        /* Toolbar */
+        .toolbar {
+            background: var(--toolbar-bg);
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 4px 20px var(--shadow);
+            z-index: 100;
+        }
+
+        .toolbar-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: white;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toolbar-title svg {
+            width: 28px;
+            height: 28px;
+        }
+
+        .toolbar-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 12px;
+            border-left: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .toolbar-group:first-of-type {
+            border-left: none;
+            padding-left: 0;
+        }
+
+        .toolbar-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            color: white;
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .toolbar-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .toolbar-btn:active {
+            transform: translateY(0);
+        }
+
+        .toolbar-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .file-name {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-family: 'JetBrains Mono', monospace;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .spacer {
+            flex: 1;
+        }
+
+        .theme-toggle {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: rotate(15deg);
+        }
+
+        .theme-toggle svg {
+            width: 22px;
+            height: 22px;
+            color: white;
+        }
+
+        /* Main Container */
+        .main-container {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Editor Panel */
+        .editor-panel {
+            width: 50%;
+            min-width: 200px;
+            display: flex;
+            flex-direction: column;
+            background: var(--editor-bg);
+            border-right: 1px solid var(--border);
+        }
+
+        .panel-header {
+            padding: 12px 20px;
+            background: var(--bg-tertiary);
+            border-bottom: 2px solid var(--accent);
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel-header svg {
+            width: 16px;
+            height: 16px;
+            color: var(--accent);
+            opacity: 1;
+        }
+
+        #editor {
+            flex: 1;
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            line-height: 1.7;
+            background: var(--editor-bg);
+            color: var(--text-primary);
+            border: none;
+            outline: none;
+            resize: none;
+            tab-size: 4;
+            caret-color: var(--accent);
+        }
+
+        #editor::placeholder {
+            color: var(--text-muted);
+        }
+
+        #editor::selection {
+            background: var(--accent-light);
+            color: var(--text-primary);
+        }
+
+        /* Resizer */
+        .resizer {
+            width: 6px;
+            background: var(--divider);
+            cursor: col-resize;
+            transition: background 0.2s ease;
+            position: relative;
+        }
+
+        .resizer:hover,
+        .resizer.active {
+            background: var(--accent);
+        }
+
+        .resizer::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 2px;
+            height: 40px;
+            background: var(--text-muted);
+            border-radius: 1px;
+            opacity: 0.5;
+        }
+
+        /* Preview Panel */
+        .preview-panel {
+            flex: 1;
+            min-width: 200px;
+            display: flex;
+            flex-direction: column;
+            background: var(--preview-bg);
+            overflow: hidden;
+        }
+
+        #preview {
+            flex: 1;
+            padding: 24px 32px;
+            overflow-y: auto;
+            line-height: 1.8;
+        }
+
+        /* Markdown Styles */
+        #preview h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 1.5em 0 0.5em;
+            padding-bottom: 0.3em;
+            border-bottom: 3px solid var(--accent);
+            color: var(--text-primary);
+        }
+
+        #preview h1:first-child {
+            margin-top: 0;
+        }
+
+        #preview h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 1.3em 0 0.4em;
+            color: var(--text-primary);
+            padding-left: 12px;
+            border-left: 4px solid var(--accent);
+        }
+
+        #preview h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 1.2em 0 0.4em;
+            color: var(--accent);
+        }
+
+        #preview h4, #preview h5, #preview h6 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 1em 0 0.4em;
+            color: var(--text-secondary);
+        }
+
+        #preview p {
+            margin: 0.8em 0;
+            color: var(--text-primary);
+        }
+
+        #preview strong {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        #preview a {
+            color: var(--accent);
+            text-decoration: none;
+            border-bottom: 1px solid var(--accent-light);
+            transition: border-color 0.2s ease;
+        }
+
+        #preview a:hover {
+            border-bottom-color: var(--accent);
+        }
+
+        #preview ul, #preview ol {
+            margin: 0.8em 0;
+            padding-left: 2em;
+        }
+
+        #preview li {
+            margin: 0.3em 0;
+        }
+
+        #preview li::marker {
+            color: var(--accent);
+        }
+
+        #preview blockquote {
+            margin: 1em 0;
+            padding: 0.5em 1em;
+            border-left: 4px solid var(--accent);
+            background: var(--accent-light);
+            border-radius: 0 8px 8px 0;
+            color: var(--text-secondary);
+        }
+
+        #preview code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9em;
+            background: var(--accent-light);
+            padding: 0.2em 0.5em;
+            border-radius: 4px;
+            color: var(--accent);
+        }
+
+        #preview pre {
+            margin: 1em 0;
+            padding: 16px;
+            background: var(--code-bg);
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+        }
+
+        #preview pre code {
+            background: none;
+            padding: 0;
+            color: var(--text-primary);
+        }
+
+        #preview table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1em 0;
+        }
+
+        #preview th, #preview td {
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            text-align: left;
+        }
+
+        #preview th {
+            background: var(--accent-light);
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        #preview tr:nth-child(even) {
+            background: var(--bg-tertiary);
+        }
+
+        #preview ::selection {
+            background: var(--accent-light);
+            color: var(--text-primary);
+        }
+
+        #preview img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin: 1em 0;
+        }
+
+        #preview hr {
+            border: none;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-light), transparent);
+            margin: 2em 0;
+        }
+
+        /* Mermaid Container */
+        .mermaid-container {
+            position: relative;
+            margin: 1.5em 0;
+            padding: 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            border-radius: 12px;
+            overflow: visible;
+        }
+
+        .mermaid-container .mermaid {
+            display: flex;
+            justify-content: center;
+        }
+
+        .mermaid-container svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .mermaid-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 6px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .mermaid-container:hover .mermaid-actions {
+            opacity: 1;
+        }
+
+        .mermaid-action-btn {
+            background: var(--accent);
+            border: none;
+            padding: 6px 10px;
+            border-radius: 6px;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .mermaid-action-btn:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .mermaid-action-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            padding: 8px 20px;
+            background: var(--bg-tertiary);
+            border-top: 2px solid var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-item svg {
+            width: 14px;
+            height: 14px;
+            color: var(--accent);
+        }
+
+        /* Hidden file input */
+        #file-input {
+            display: none;
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                height: auto !important;
+                overflow: visible !important;
+                background: white !important;
+                color: black !important;
+            }
+
+            .toolbar, .editor-panel, .resizer, .status-bar, .mermaid-actions, .panel-header {
+                display: none !important;
+            }
+
+            .main-container {
+                display: block !important;
+                height: auto !important;
+                overflow: visible !important;
+            }
+
+            .preview-panel {
+                width: 100% !important;
+                height: auto !important;
+                overflow: visible !important;
+                position: static !important;
+            }
+
+            #preview {
+                padding: 20px !important;
+                overflow: visible !important;
+                height: auto !important;
+            }
+
+            #preview h1, #preview h2, #preview h3, #preview h4, #preview h5, #preview h6 {
+                color: black !important;
+            }
+
+            #preview p, #preview li, #preview td, #preview th {
+                color: #333 !important;
+            }
+
+            #preview pre, #preview code {
+                background: #f5f5f5 !important;
+                color: #333 !important;
+            }
+
+            #preview pre {
+                border: 1px solid #ccc !important;
+                white-space: pre-wrap !important;
+                word-wrap: break-word !important;
+            }
+
+            #preview blockquote {
+                border-left-color: #666 !important;
+                background: #f9f9f9 !important;
+                color: #333 !important;
+            }
+
+            #preview table {
+                border-collapse: collapse !important;
+            }
+
+            #preview th, #preview td {
+                border: 1px solid #ccc !important;
+            }
+
+            .mermaid-container {
+                break-inside: avoid !important;
+                page-break-inside: avoid !important;
+                background: white !important;
+                border: 1px solid #ccc !important;
+            }
+
+            .mermaid svg {
+                max-width: 100% !important;
+                height: auto !important;
+            }
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            right: 24px;
+            background: var(--accent);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: 0 4px 20px var(--shadow);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Dropdown menu */
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            margin-top: 6px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 8px 30px var(--shadow);
+            min-width: 160px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+            z-index: 200;
+        }
+
+        .dropdown.open .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-item:first-child {
+            border-radius: 7px 7px 0 0;
+        }
+
+        .dropdown-item:last-child {
+            border-radius: 0 0 7px 7px;
+        }
+
+        .dropdown-item:hover {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        .dropdown-item:hover svg {
+            color: var(--accent);
+        }
+
+        .dropdown-item svg {
+            width: 16px;
+            height: 16px;
+            opacity: 0.7;
+            transition: color 0.2s ease;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 4px 0;
+        }
+
+        /* Color Palette */
+        .color-palette-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .color-palette-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .color-palette-btn svg {
+            width: 22px;
+            height: 22px;
+            color: white;
+        }
+
+        .color-palette-popup {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 10px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 8px 30px var(--shadow);
+            padding: 16px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+            z-index: 200;
+            min-width: 200px;
+        }
+
+        .color-palette-popup.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .color-palette-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .color-swatch {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.1);
+        }
+
+        .color-swatch.active {
+            border-color: var(--text-primary);
+        }
+
+        .color-swatch.active::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .color-swatch[data-color="indigo"] { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .color-swatch[data-color="blue"] { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); }
+        .color-swatch[data-color="emerald"] { background: linear-gradient(135deg, #10b981 0%, #047857 100%); }
+        .color-swatch[data-color="rose"] { background: linear-gradient(135deg, #f43f5e 0%, #be123c 100%); }
+        .color-swatch[data-color="amber"] { background: linear-gradient(135deg, #f59e0b 0%, #b45309 100%); }
+        .color-swatch[data-color="cyan"] { background: linear-gradient(135deg, #06b6d4 0%, #0e7490 100%); }
+        .color-swatch[data-color="violet"] { background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); }
+        .color-swatch[data-color="slate"] { background: linear-gradient(135deg, #64748b 0%, #334155 100%); }
+    
+        /* Language Popup */
+        .lang-popup {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 10px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 8px 30px var(--shadow);
+            padding: 16px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+            z-index: 200;
+            min-width: 180px;
+        }
+
+        .lang-popup.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .lang-popup-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .lang-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .lang-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-primary);
+        }
+
+        .lang-item:hover {
+            background: var(--accent-light);
+        }
+
+        .lang-item.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .lang-item-flag {
+            font-size: 1.2rem;
+        }
+
+        .lang-item-name {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .lang-toggle {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            height: 44px;
+            border-radius: 22px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: white;
+            padding: 0 14px;
+            gap: 6px;
+        }
+
+        .lang-toggle:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+    </style>
+</head>
+<body>
+    <input type="file" id="file-input" accept=".md,.txt,.markdown,text/*">
+    
+    <div class="toolbar">
+        <div class="toolbar-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                <polyline points="14,2 14,8 20,8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+                <line x1="10" y1="9" x2="8" y2="9"/>
+            </svg>
+            Markdown Editor Pro
+        </div>
+        
+        <div class="toolbar-group">
+            <div class="dropdown" id="file-dropdown">
+                <button class="toolbar-btn" onclick="toggleDropdown('file-dropdown')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                        <polyline points="14,2 14,8 20,8"/>
+                    </svg>
+                    <span data-i18n="file">File</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;">
+                        <polyline points="6,9 12,15 18,9"/>
+                    </svg>
+                </button>
+                <div class="dropdown-menu">
+                    <div class="dropdown-item" onclick="newFile()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                            <line x1="12" y1="18" x2="12" y2="12"/>
+                            <line x1="9" y1="15" x2="15" y2="15"/>
+                        </svg>
+                        <span data-i18n="newFile">New</span>
+                    </div>
+                    <div class="dropdown-item" onclick="openFile()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                        </svg>
+                        <span data-i18n="openFile">Open</span>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-item" onclick="saveFile()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                            <polyline points="17,21 17,13 7,13 7,21"/>
+                            <polyline points="7,3 7,8 15,8"/>
+                        </svg>
+                        <span data-i18n="save">Save</span>
+                    </div>
+                    <div class="dropdown-item" onclick="saveFileAs()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
+                        </svg>
+                        <span data-i18n="saveAs">Save As</span>
+                    </div>
+                </div>
+            </div>
+            <span class="file-name" id="file-name-display">untitled.md</span>
+        </div>
+        
+        <div class="toolbar-group">
+            <button class="toolbar-btn" onclick="printPreview()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6,9 6,2 18,2 18,9"/>
+                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                    <rect x="6" y="14" width="12" height="8"/>
+                </svg>
+                <span data-i18n="print">Print</span>
+            </button>
+        </div>
+        
+        <div class="spacer"></div>
+        
+        <!-- Language Selector -->
+        <div style="position: relative;">
+            <button class="lang-toggle" onclick="toggleLangPopup()" id="lang-toggle-btn">
+                <span id="current-lang-flag">🌐</span>
+                <span id="current-lang-code">EN</span>
+            </button>
+            <div class="lang-popup" id="lang-popup">
+                <div class="lang-popup-title" data-i18n="language">Language</div>
+                <div class="lang-list">
+                    <div class="lang-item active" data-lang="en" onclick="setLanguage('en')">
+                        <span class="lang-item-flag">🇺🇸</span>
+                        <span class="lang-item-name">English</span>
+                    </div>
+                    <div class="lang-item" data-lang="ja" onclick="setLanguage('ja')">
+                        <span class="lang-item-flag">🇯🇵</span>
+                        <span class="lang-item-name">日本語</span>
+                    </div>
+                    <div class="lang-item" data-lang="zh" onclick="setLanguage('zh')">
+                        <span class="lang-item-flag">🇨🇳</span>
+                        <span class="lang-item-name">中文</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="position: relative;">
+            <button class="color-palette-btn" onclick="toggleColorPalette()" data-i18n-title="colorTheme" title="Color Theme">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <circle cx="12" cy="12" r="4"/>
+                    <line x1="12" y1="2" x2="12" y2="4"/>
+                    <line x1="12" y1="20" x2="12" y2="22"/>
+                    <line x1="2" y1="12" x2="4" y2="12"/>
+                    <line x1="20" y1="12" x2="22" y2="12"/>
+                </svg>
+            </button>
+            <div class="color-palette-popup" id="color-palette">
+                <div class="color-palette-title" data-i18n="colorTheme">Color Theme</div>
+                <div class="color-grid">
+                    <div class="color-swatch active" data-color="indigo" onclick="setColorTheme('indigo')" title="Indigo"></div>
+                    <div class="color-swatch" data-color="blue" onclick="setColorTheme('blue')" title="Blue"></div>
+                    <div class="color-swatch" data-color="cyan" onclick="setColorTheme('cyan')" title="Cyan"></div>
+                    <div class="color-swatch" data-color="emerald" onclick="setColorTheme('emerald')" title="Emerald"></div>
+                    <div class="color-swatch" data-color="amber" onclick="setColorTheme('amber')" title="Amber"></div>
+                    <div class="color-swatch" data-color="rose" onclick="setColorTheme('rose')" title="Rose"></div>
+                    <div class="color-swatch" data-color="violet" onclick="setColorTheme('violet')" title="Violet"></div>
+                    <div class="color-swatch" data-color="slate" onclick="setColorTheme('slate')" title="Slate"></div>
+                </div>
+            </div>
+        </div>
+        
+        <button class="theme-toggle" onclick="toggleTheme()" data-i18n-title="darkLightMode" title="Dark/Light Mode">
+            <svg id="theme-icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="5"/>
+                <line x1="12" y1="1" x2="12" y2="3"/>
+                <line x1="12" y1="21" x2="12" y2="23"/>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                <line x1="1" y1="12" x2="3" y2="12"/>
+                <line x1="21" y1="12" x2="23" y2="12"/>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+            </svg>
+            <svg id="theme-icon-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+        </button>
+    </div>
+    
+    <div class="main-container">
+        <div class="editor-panel" id="editor-panel">
+            <div class="panel-header">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="16,18 22,12 16,6"/>
+                    <polyline points="8,6 2,12 8,18"/>
+                </svg>
+                <span data-i18n="editor">Editor</span>
+            </div>
+            <textarea id="editor" data-i18n-placeholder="editorPlaceholder" placeholder="Enter Markdown here..."></textarea>
+        </div>
+        
+        <div class="resizer" id="resizer"></div>
+        
+        <div class="preview-panel">
+            <div class="panel-header">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                </svg>
+                <span data-i18n="preview">Preview</span>
+            </div>
+            <div id="preview"></div>
+        </div>
+    </div>
+    
+    <div class="status-bar">
+        <div class="status-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                <polyline points="14,2 14,8 20,8"/>
+            </svg>
+            <span id="char-count">0</span> <span data-i18n="characters">characters</span>
+        </div>
+        <div class="status-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="8" y1="6" x2="21" y2="6"/>
+                <line x1="8" y1="12" x2="21" y2="12"/>
+                <line x1="8" y1="18" x2="21" y2="18"/>
+                <line x1="3" y1="6" x2="3.01" y2="6"/>
+                <line x1="3" y1="12" x2="3.01" y2="12"/>
+                <line x1="3" y1="18" x2="3.01" y2="18"/>
+            </svg>
+            <span id="line-count">0</span> <span data-i18n="lines">lines</span>
+        </div>
+        <div class="status-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7"/>
+                <rect x="14" y="3" width="7" height="7"/>
+                <rect x="14" y="14" width="7" height="7"/>
+                <rect x="3" y="14" width="7" height="7"/>
+            </svg>
+            <span id="mermaid-count">0</span> <span data-i18n="diagrams">diagrams</span>
+        </div>
+    </div>
+    
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ==================== Internationalization (i18n) ====================
+        const translations = {
+            en: {
+                file: "File",
+                newFile: "New",
+                openFile: "Open",
+                save: "Save",
+                saveAs: "Save As",
+                print: "Print",
+                editor: "Editor",
+                preview: "Preview",
+                editorPlaceholder: "Enter Markdown here...",
+                characters: "characters",
+                lines: "lines",
+                diagrams: "diagrams",
+                language: "Language",
+                colorTheme: "Color Theme",
+                darkLightMode: "Dark/Light Mode",
+                newFileCreated: "New file created",
+                fileOpened: "Opened: ",
+                fileSaved: "Saved",
+                fileSavedAs: "Saved as: ",
+                fileDownloaded: "Downloaded: ",
+                unsavedChanges: "You have unsaved changes. Create new file anyway?",
+                pngDownloaded: "PNG downloaded",
+                svgDownloaded: "SVG downloaded",
+                pngExportFailed: "Failed to export PNG",
+                svgNotFound: "SVG element not found",
+                diagramNotFound: "Diagram not found",
+                fileReadFailed: "Failed to read file",
+                colorThemeChanged: "Color theme changed",
+                sampleMarkdown: `# Welcome to Markdown Editor Pro!
+
+This editor supports **Markdown** and **Mermaid diagrams**.
+
+## Basic Formatting
+
+Text can be **bold** or *italic*. You can also use \`inline code\`.
+
+### Lists
+
+- Item 1
+- Item 2
+  - Nested item
+- Item 3
+
+### Numbered List
+
+1. First step
+2. Second step
+3. Final step
+
+## Code Block
+
+\`\`\`javascript
+function greeting(name) {
+    console.log(\`Hello, \${name}!\`);
+}
+
+greeting('World');
+\`\`\`
+
+## Blockquote
+
+> This is a blockquote.
+> It can span multiple lines.
+
+## Table
+
+| Feature | Status | Description |
+|---------|--------|-------------|
+| Markdown | ✅ | Full support |
+| Mermaid | ✅ | Diagram creation |
+| Dark Mode | ✅ | Theme toggle |
+
+---
+
+## Mermaid Diagrams
+
+### Flowchart
+
+\`\`\`mermaid
+flowchart TD
+    A[Start] --> B{Decision}
+    B -->|Yes| C[Process A]
+    B -->|No| D[Process B]
+    C --> E[End]
+    D --> E
+\`\`\`
+
+### Sequence Diagram
+
+\`\`\`mermaid
+sequenceDiagram
+    User->>Browser: Access URL
+    Browser->>Server: HTTP Request
+    Server->>Database: Fetch Data
+    Database-->>Server: Return Data
+    Server-->>Browser: HTML Response
+    Browser-->>User: Display Page
+\`\`\`
+
+### Class Diagram
+
+\`\`\`mermaid
+classDiagram
+    class Animal {
+        +String name
+        +int age
+        +makeSound()
+    }
+    class Dog {
+        +String breed
+        +bark()
+    }
+    class Cat {
+        +String color
+        +meow()
+    }
+    Animal <|-- Dog
+    Animal <|-- Cat
+\`\`\`
+
+### Pie Chart
+
+\`\`\`mermaid
+pie title Project Progress
+    "Completed" : 45
+    "In Progress" : 30
+    "Not Started" : 25
+\`\`\`
+
+---
+
+## Tips
+
+1. **File Operations**: Use the File menu to open/save files
+2. **Resize Panels**: Drag the center bar to resize
+3. **Export Diagrams**: Hover over diagrams for PNG/SVG buttons
+4. **Print**: Only the preview is printed
+5. **Theme**: Toggle dark/light mode with the button in the top right
+
+Enjoy! 🚀
+`
+            },
+            ja: {
+                file: "ファイル",
+                newFile: "新規作成",
+                openFile: "開く",
+                save: "上書き保存",
+                saveAs: "名前を付けて保存",
+                print: "印刷",
+                editor: "エディタ",
+                preview: "プレビュー",
+                editorPlaceholder: "Markdownを入力してください...",
+                characters: "文字",
+                lines: "行",
+                diagrams: "図",
+                language: "言語",
+                colorTheme: "カラーテーマ",
+                darkLightMode: "ダーク/ライトモード",
+                newFileCreated: "新規ファイルを作成しました",
+                fileOpened: "開きました: ",
+                fileSaved: "保存しました",
+                fileSavedAs: "保存しました: ",
+                fileDownloaded: "ダウンロードしました: ",
+                unsavedChanges: "保存されていない変更があります。新規作成しますか？",
+                pngDownloaded: "PNGをダウンロードしました",
+                svgDownloaded: "SVGをダウンロードしました",
+                pngExportFailed: "PNGのエクスポートに失敗しました",
+                svgNotFound: "SVG要素が見つかりません",
+                diagramNotFound: "図が見つかりません",
+                fileReadFailed: "ファイルの読み込みに失敗しました",
+                colorThemeChanged: "カラーテーマを変更しました",
+                sampleMarkdown: `# Markdown Editor Pro へようこそ！
+
+このエディタは **Markdown** と **Mermaid図** をサポートしています。
+
+## 基本的な書式
+
+テキストは **太字** や *斜体* にできます。また、\`インラインコード\` も使えます。
+
+### リスト
+
+- 項目1
+- 項目2
+  - ネストされた項目
+- 項目3
+
+### 番号付きリスト
+
+1. 最初のステップ
+2. 次のステップ
+3. 最後のステップ
+
+## コードブロック
+
+\`\`\`javascript
+function greeting(name) {
+    console.log(\`Hello, \${name}!\`);
+}
+
+greeting('World');
+\`\`\`
+
+## 引用
+
+> これは引用ブロックです。
+> 複数行にわたることができます。
+
+## テーブル
+
+| 機能 | 状態 | 説明 |
+|------|------|------|
+| Markdown | ✅ | 完全サポート |
+| Mermaid | ✅ | 図表作成 |
+| ダークモード | ✅ | テーマ切替 |
+
+---
+
+## Mermaid 図表
+
+### フローチャート
+
+\`\`\`mermaid
+flowchart TD
+    A[開始] --> B{条件分岐}
+    B -->|Yes| C[処理A]
+    B -->|No| D[処理B]
+    C --> E[終了]
+    D --> E
+\`\`\`
+
+### シーケンス図
+
+\`\`\`mermaid
+sequenceDiagram
+    User->>Browser: URLにアクセス
+    Browser->>Server: HTTPリクエスト
+    Server->>Database: データ取得
+    Database-->>Server: データ返却
+    Server-->>Browser: HTMLレスポンス
+    Browser-->>User: ページ表示
+\`\`\`
+
+### クラス図
+
+\`\`\`mermaid
+classDiagram
+    class Animal {
+        +String name
+        +int age
+        +makeSound()
+    }
+    class Dog {
+        +String breed
+        +bark()
+    }
+    class Cat {
+        +String color
+        +meow()
+    }
+    Animal <|-- Dog
+    Animal <|-- Cat
+\`\`\`
+
+### 円グラフ
+
+\`\`\`mermaid
+pie title プロジェクトの進捗
+    "完了" : 45
+    "進行中" : 30
+    "未着手" : 25
+\`\`\`
+
+---
+
+## 使い方のヒント
+
+1. **ファイル操作**: ツールバーの「ファイル」メニューから開く・保存ができます
+2. **リサイズ**: 中央のバーをドラッグしてパネルサイズを変更
+3. **Mermaid図のエクスポート**: 図にマウスを乗せると PNG/SVG ボタンが表示されます
+4. **印刷**: プレビュー部分のみが印刷されます
+5. **テーマ**: 右上のボタンでダーク/ライトモードを切替
+
+お楽しみください！ 🚀
+`
+            },
+            zh: {
+                file: "文件",
+                newFile: "新建",
+                openFile: "打开",
+                save: "保存",
+                saveAs: "另存为",
+                print: "打印",
+                editor: "编辑器",
+                preview: "预览",
+                editorPlaceholder: "在此输入 Markdown...",
+                characters: "字符",
+                lines: "行",
+                diagrams: "图表",
+                language: "语言",
+                colorTheme: "颜色主题",
+                darkLightMode: "深色/浅色模式",
+                newFileCreated: "已创建新文件",
+                fileOpened: "已打开: ",
+                fileSaved: "已保存",
+                fileSavedAs: "已保存为: ",
+                fileDownloaded: "已下载: ",
+                unsavedChanges: "有未保存的更改。确定要新建文件吗？",
+                pngDownloaded: "PNG 已下载",
+                svgDownloaded: "SVG 已下载",
+                pngExportFailed: "PNG 导出失败",
+                svgNotFound: "未找到 SVG 元素",
+                diagramNotFound: "未找到图表",
+                fileReadFailed: "文件读取失败",
+                colorThemeChanged: "颜色主题已更改",
+                sampleMarkdown: `# 欢迎使用 Markdown Editor Pro！
+
+本编辑器支持 **Markdown** 和 **Mermaid 图表**。
+
+## 基本格式
+
+文本可以设置为 **粗体** 或 *斜体*。还可以使用 \`行内代码\`。
+
+### 列表
+
+- 项目 1
+- 项目 2
+  - 嵌套项目
+- 项目 3
+
+### 有序列表
+
+1. 第一步
+2. 第二步
+3. 最后一步
+
+## 代码块
+
+\`\`\`javascript
+function greeting(name) {
+    console.log(\`Hello, \${name}!\`);
+}
+
+greeting('World');
+\`\`\`
+
+## 引用
+
+> 这是一个引用块。
+> 可以跨越多行。
+
+## 表格
+
+| 功能 | 状态 | 描述 |
+|------|------|------|
+| Markdown | ✅ | 完全支持 |
+| Mermaid | ✅ | 图表创建 |
+| 深色模式 | ✅ | 主题切换 |
+
+---
+
+## Mermaid 图表
+
+### 流程图
+
+\`\`\`mermaid
+flowchart TD
+    A[开始] --> B{条件判断}
+    B -->|是| C[处理 A]
+    B -->|否| D[处理 B]
+    C --> E[结束]
+    D --> E
+\`\`\`
+
+### 时序图
+
+\`\`\`mermaid
+sequenceDiagram
+    User->>Browser: 访问 URL
+    Browser->>Server: HTTP 请求
+    Server->>Database: 获取数据
+    Database-->>Server: 返回数据
+    Server-->>Browser: HTML 响应
+    Browser-->>User: 显示页面
+\`\`\`
+
+### 类图
+
+\`\`\`mermaid
+classDiagram
+    class Animal {
+        +String name
+        +int age
+        +makeSound()
+    }
+    class Dog {
+        +String breed
+        +bark()
+    }
+    class Cat {
+        +String color
+        +meow()
+    }
+    Animal <|-- Dog
+    Animal <|-- Cat
+\`\`\`
+
+### 饼图
+
+\`\`\`mermaid
+pie title 项目进度
+    "已完成" : 45
+    "进行中" : 30
+    "未开始" : 25
+\`\`\`
+
+---
+
+## 使用提示
+
+1. **文件操作**：使用文件菜单打开/保存文件
+2. **调整大小**：拖动中间分隔条调整面板大小
+3. **导出图表**：将鼠标悬停在图表上可显示 PNG/SVG 按钮
+4. **打印**：仅打印预览部分
+5. **主题**：点击右上角按钮切换深色/浅色模式
+
+祝您使用愉快！ 🚀
+`
+            }
+        };
+
+        const langConfig = {
+            en: { flag: '🇺🇸', code: 'EN' },
+            ja: { flag: '🇯🇵', code: 'JA' },
+            zh: { flag: '🇨🇳', code: 'ZH' }
+        };
+
+        let currentLang = 'en';
+
+        function t(key) {
+            return translations[currentLang][key] || translations['en'][key] || key;
+        }
+
+        function updateUILanguage() {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                el.textContent = t(key);
+            });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                el.placeholder = t(key);
+            });
+            document.querySelectorAll('[data-i18n-title]').forEach(el => {
+                const key = el.getAttribute('data-i18n-title');
+                el.title = t(key);
+            });
+            const config = langConfig[currentLang];
+            document.getElementById('current-lang-flag').textContent = config.flag;
+            document.getElementById('current-lang-code').textContent = config.code;
+            document.querySelectorAll('.lang-item').forEach(item => {
+                item.classList.toggle('active', item.dataset.lang === currentLang);
+            });
+            document.documentElement.lang = currentLang;
+        }
+
+        function setLanguage(lang, updateContent = true) {
+            const previousLang = currentLang;
+            currentLang = lang;
+            updateUILanguage();
+            if (updateContent) {
+                const editorContent = editor.value.trim();
+                const isDefaultContent = Object.values(translations).some(
+                    t => editorContent === t.sampleMarkdown.trim()
+                );
+                if (!editorContent || isDefaultContent) {
+                    editor.value = t('sampleMarkdown');
+                    updatePreview();
+                }
+            }
+            localStorage.setItem('language', lang);
+            document.getElementById('lang-popup').classList.remove('open');
+        }
+
+        function toggleLangPopup() {
+            document.getElementById('lang-popup').classList.toggle('open');
+            document.getElementById('color-palette').classList.remove('open');
+        }
+
+        // State
+        let currentFileName = 'untitled.md';
+        let fileHandle = null;
+        let isDirty = false;
+        let mermaidCounter = 0;
+
+        // DOM Elements
+        const editor = document.getElementById('editor');
+        const preview = document.getElementById('preview');
+        const fileInput = document.getElementById('file-input');
+        const fileNameDisplay = document.getElementById('file-name-display');
+        const charCount = document.getElementById('char-count');
+        const lineCount = document.getElementById('line-count');
+        const mermaidCount = document.getElementById('mermaid-count');
+        const resizer = document.getElementById('resizer');
+        const editorPanel = document.getElementById('editor-panel');
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load saved language preference (default: English)
+            const savedLang = localStorage.getItem('language') || 'en';
+            currentLang = savedLang;
+            updateUILanguage();
+            
+            editor.value = t('sampleMarkdown');
+            updatePreview();
+            updateStats();
+            initResizer();
+            
+            // Check for saved theme preference
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.setAttribute('data-theme', 'dark');
+                updateThemeIcon();
+            }
+            
+            // Check for saved color theme
+            const savedColor = localStorage.getItem('colorTheme') || 'indigo';
+            setColorTheme(savedColor, false);
+            
+            updateMermaidTheme();
+        });
+
+        // Marked configuration
+        marked.setOptions({
+            highlight: function(code, lang) {
+                if (lang && hljs.getLanguage(lang)) {
+                    return hljs.highlight(code, { language: lang }).value;
+                }
+                return hljs.highlightAuto(code).value;
+            },
+            breaks: true,
+            gfm: true
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            editor.value = t('sampleMarkdown');
+            updatePreview();
+            updateStats();
+            initResizer();
+            
+            // Check for saved theme preference
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.setAttribute('data-theme', 'dark');
+                updateThemeIcon();
+            }
+            
+            // Check for saved color theme
+            const savedColor = localStorage.getItem('colorTheme') || 'indigo';
+            setColorTheme(savedColor, false);
+            
+            updateMermaidTheme();
+        });
+
+        // Editor input handler
+        editor.addEventListener('input', () => {
+            isDirty = true;
+            updatePreview();
+            updateStats();
+        });
+
+        // Tab key support
+        editor.addEventListener('keydown', (e) => {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const start = editor.selectionStart;
+                const end = editor.selectionEnd;
+                editor.value = editor.value.substring(0, start) + '    ' + editor.value.substring(end);
+                editor.selectionStart = editor.selectionEnd = start + 4;
+                updatePreview();
+            }
+            
+            // Keyboard shortcuts
+            if (e.ctrlKey || e.metaKey) {
+                if (e.key === 's') {
+                    e.preventDefault();
+                    saveFile();
+                } else if (e.key === 'o') {
+                    e.preventDefault();
+                    openFile();
+                }
+            }
+        });
+
+        // Update preview
+        async function updatePreview() {
+            let content = editor.value;
+            mermaidCounter = 0;
+            
+            // Process mermaid code blocks
+            const mermaidRegex = /```mermaid\n([\s\S]*?)```/g;
+            const mermaidBlocks = [];
+            let match;
+            
+            while ((match = mermaidRegex.exec(content)) !== null) {
+                mermaidBlocks.push(match[1]);
+            }
+            
+            // Replace mermaid blocks with placeholders
+            content = content.replace(mermaidRegex, (match, code) => {
+                const id = `mermaid-${mermaidCounter++}`;
+                return `<div class="mermaid-container" data-mermaid-id="${id}">
+                    <div class="mermaid-actions">
+                        <button class="mermaid-action-btn" onclick="downloadMermaidPNG('${id}')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                <circle cx="8.5" cy="8.5" r="1.5"/>
+                                <polyline points="21,15 16,10 5,21"/>
+                            </svg>
+                            PNG
+                        </button>
+                        <button class="mermaid-action-btn" onclick="downloadMermaidSVG('${id}')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="12,2 2,7 12,12 22,7 12,2"/>
+                                <polyline points="2,17 12,22 22,17"/>
+                                <polyline points="2,12 12,17 22,12"/>
+                            </svg>
+                            SVG
+                        </button>
+                    </div>
+                    <div class="mermaid" id="${id}">${code.trim()}</div>
+                </div>`;
+            });
+            
+            // Parse markdown
+            preview.innerHTML = marked.parse(content);
+            
+            // Render mermaid diagrams
+            try {
+                await mermaid.run({
+                    querySelector: '.mermaid'
+                });
+            } catch (error) {
+                console.error('Mermaid rendering error:', error);
+            }
+            
+            // Update mermaid count
+            mermaidCount.textContent = mermaidBlocks.length;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Update statistics
+        function updateStats() {
+            const text = editor.value;
+            charCount.textContent = text.length;
+            lineCount.textContent = `${text.split('\n').length} 行`;
+        }
+
+        // Resizer functionality
+        function initResizer() {
+            let isResizing = false;
+            
+            resizer.addEventListener('mousedown', (e) => {
+                isResizing = true;
+                resizer.classList.add('active');
+            });
+            
+            document.addEventListener('mousemove', (e) => {
+                if (!isResizing) return;
+                
+                const containerRect = document.querySelector('.main-container').getBoundingClientRect();
+                const newWidth = e.clientX - containerRect.left;
+                const percentage = (newWidth / containerRect.width) * 100;
+                
+                if (percentage >= 15 && percentage <= 85) {
+                    editorPanel.style.width = `${percentage}%`;
+                }
+            });
+            
+            document.addEventListener('mouseup', () => {
+                isResizing = false;
+                resizer.classList.remove('active');
+            });
+        }
+
+        // Theme toggle
+        function toggleTheme() {
+            const isDark = document.body.getAttribute('data-theme') === 'dark';
+            document.body.setAttribute('data-theme', isDark ? '' : 'dark');
+            localStorage.setItem('theme', isDark ? 'light' : 'dark');
+            updateThemeIcon();
+            updateMermaidTheme();
+        }
+
+        function updateThemeIcon() {
+            const isDark = document.body.getAttribute('data-theme') === 'dark';
+            document.getElementById('theme-icon-light').style.display = isDark ? 'none' : 'block';
+            document.getElementById('theme-icon-dark').style.display = isDark ? 'block' : 'none';
+            
+            // Update highlight.js theme
+            const hljsTheme = document.getElementById('hljs-theme');
+            hljsTheme.href = isDark 
+                ? 'https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css'
+                : 'https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css';
+        }
+
+        // Color theme
+        function toggleColorPalette() {
+            const palette = document.getElementById('color-palette');
+            palette.classList.toggle('open');
+        }
+
+        function setColorTheme(color, save = true) {
+            document.body.setAttribute('data-color', color);
+            
+            // Update active swatch
+            document.querySelectorAll('.color-swatch').forEach(swatch => {
+                swatch.classList.toggle('active', swatch.dataset.color === color);
+            });
+            
+            if (save) {
+                localStorage.setItem('colorTheme', color);
+                showToast(t('colorThemeChanged'));
+            }
+            
+            // Close palette
+            document.getElementById('color-palette').classList.remove('open');
+        }
+
+        function getColorName(color) {
+            const names = {
+                indigo: 'インディゴ',
+                blue: 'ブルー',
+                emerald: 'エメラルド',
+                rose: 'ローズ',
+                amber: 'アンバー',
+                cyan: 'シアン',
+                violet: 'バイオレット',
+                slate: 'スレート'
+            };
+            return names[color] || color;
+        }
+
+        function updateMermaidTheme() {
+            const isDark = document.body.getAttribute('data-theme') === 'dark';
+            mermaid.initialize({
+                startOnLoad: false,
+                theme: isDark ? 'dark' : 'default',
+                securityLevel: 'loose'
+            });
+            updatePreview();
+        }
+
+        // Dropdown toggle
+        function toggleDropdown(id) {
+            const dropdown = document.getElementById(id);
+            const wasOpen = dropdown.classList.contains('open');
+            
+            // Close all dropdowns
+            document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('open'));
+            
+            if (!wasOpen) {
+                dropdown.classList.add('open');
+            }
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.dropdown')) {
+                document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('open'));
+            }
+            if (!e.target.closest('.color-palette-btn') && !e.target.closest('.color-palette-popup')) {
+                document.getElementById('color-palette').classList.remove('open');
+            }
+        });
+
+        // File operations
+        function newFile() {
+            if (isDirty && !confirm(t('unsavedChanges'))) {
+                return;
+            }
+            editor.value = '';
+            currentFileName = 'untitled.md';
+            fileHandle = null;
+            isDirty = false;
+            updateFileNameDisplay();
+            updatePreview();
+            updateStats();
+            showToast(t('newFileCreated'));
+        }
+
+        function openFile() {
+            fileInput.click();
+        }
+
+        fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            try {
+                const text = await file.text();
+                editor.value = text;
+                currentFileName = file.name;
+                isDirty = false;
+                updateFileNameDisplay();
+                updatePreview();
+                updateStats();
+                showToast(t('fileOpened') + file.name);
+            } catch (error) {
+                showToast(t('fileReadFailed'));
+                console.error(error);
+            }
+            
+            fileInput.value = '';
+        });
+
+        async function saveFile() {
+            if ('showSaveFilePicker' in window && fileHandle) {
+                try {
+                    const writable = await fileHandle.createWritable();
+                    await writable.write(editor.value);
+                    await writable.close();
+                    isDirty = false;
+                    showToast(t('fileSaved'));
+                } catch (error) {
+                    if (error.name !== 'AbortError') {
+                        saveFileAs();
+                    }
+                }
+            } else {
+                saveFileAs();
+            }
+        }
+
+        async function saveFileAs() {
+            if ('showSaveFilePicker' in window) {
+                try {
+                    fileHandle = await window.showSaveFilePicker({
+                        suggestedName: currentFileName,
+                        types: [{
+                            description: 'Markdown Files',
+                            accept: { 'text/markdown': ['.md'] }
+                        }, {
+                            description: 'Text Files',
+                            accept: { 'text/plain': ['.txt'] }
+                        }]
+                    });
+                    
+                    const writable = await fileHandle.createWritable();
+                    await writable.write(editor.value);
+                    await writable.close();
+                    
+                    currentFileName = fileHandle.name;
+                    isDirty = false;
+                    updateFileNameDisplay();
+                    showToast(t('fileSavedAs') + currentFileName);
+                } catch (error) {
+                    if (error.name !== 'AbortError') {
+                        downloadFile();
+                    }
+                }
+            } else {
+                downloadFile();
+            }
+        }
+
+        function downloadFile() {
+            const blob = new Blob([editor.value], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = currentFileName;
+            a.click();
+            URL.revokeObjectURL(url);
+            isDirty = false;
+            showToast(t('fileDownloaded') + currentFileName);
+        }
+
+        function updateFileNameDisplay() {
+            fileNameDisplay.textContent = currentFileName;
+        }
+
+        // Print
+        function printPreview() {
+            window.print();
+        }
+
+        // Mermaid export functions
+        async function downloadMermaidPNG(id) {
+            const container = document.querySelector(`[data-mermaid-id="${id}"]`);
+            if (!container) {
+                showToast(t('diagramNotFound'));
+                return;
+            }
+            
+            try {
+                // Hide action buttons temporarily
+                const actions = container.querySelector('.mermaid-actions');
+                if (actions) actions.style.display = 'none';
+                
+                const canvas = await html2canvas(container, {
+                    backgroundColor: document.body.getAttribute('data-theme') === 'dark' ? '#1a1a2e' : '#ffffff',
+                    scale: 2,
+                    useCORS: true,
+                    logging: false
+                });
+                
+                // Restore action buttons
+                if (actions) actions.style.display = '';
+                
+                canvas.toBlob((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `mermaid-diagram-${Date.now()}.png`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    showToast(t('pngDownloaded'));
+                }, 'image/png');
+            } catch (error) {
+                console.error('PNG export error:', error);
+                showToast(t('pngExportFailed'));
+            }
+        }
+
+        function downloadMermaidSVG(id) {
+            const element = document.getElementById(id);
+            if (!element) return;
+            
+            try {
+                const svg = element.querySelector('svg');
+                if (!svg) {
+                    showToast(t('svgNotFound'));
+                    return;
+                }
+                
+                const svgData = new XMLSerializer().serializeToString(svg);
+                const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `mermaid-diagram-${Date.now()}.svg`;
+                a.click();
+                
+                URL.revokeObjectURL(url);
+                showToast(t('svgDownloaded'));
+            } catch (error) {
+                console.error('SVG export error:', error);
+                showToast(t('svgNotFound'));
+            }
+        }
+
+        // Toast notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Warn before leaving with unsaved changes
+        window.addEventListener('beforeunload', (e) => {
+            if (isDirty) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+    
+    </script>
+</body>
+</html>
