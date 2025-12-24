@@ -102,6 +102,9 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📝 Changelog
 
+### v1.0.1
+- Multilingual support (English, Chinese, Japanese)
+
 ### v1.0.0
 - Initial release
 - Real-time Markdown preview
