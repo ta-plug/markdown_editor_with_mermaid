@@ -24,7 +24,10 @@ A feature-rich, browser-based Markdown editor with real-time preview, Mermaid di
 
 ### Option 1: Direct Use
 Simply download `markdown-editor.html` and open it in your web browser. No installation or server required!
+
 or
+or
+
 Visit the [GitHub Pages version](https://ta-plug.github.io/markdown_editor_with_mermaid/markdown-editor.html)
 
 
