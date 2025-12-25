@@ -25,6 +25,8 @@ A feature-rich, browser-based Markdown editor with real-time preview, Mermaid di
 - **Keyboard Shortcuts**:
   - `Ctrl/Cmd + S`: Save file
   - `Ctrl/Cmd + O`: Open file
+  - `Ctrl/Cmd + Z`: Undo
+  - `Ctrl/Cmd + Y`: Redo (or `Ctrl/Cmd + Shift + Z`)
   - `Tab`: Insert spaces (configurable: 2/4/8)
   - `Shift+Tab`: Remove indent
   - `Enter`: Auto-indent (preserves current line's indentation)
@@ -130,6 +132,11 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 5. Open a Pull Request
 
 ## 📝 Changelog
+
+### v1.2.1
+- Unlimited Undo/Redo functionality
+- Keyboard shortcuts: Ctrl+Z (Undo), Ctrl+Y or Ctrl+Shift+Z (Redo)
+- Undo/Redo toolbar buttons with visual feedback
 
 ### v1.2.0
 - Sample code insertion feature with modal dialog

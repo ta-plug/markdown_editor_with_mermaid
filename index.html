@@ -1432,8 +1432,20 @@
             </div>
             <span class="file-name" id="file-name-display">untitled.md</span>
         </div>
-        
+
         <div class="toolbar-group">
+            <button class="toolbar-btn" id="undo-btn" onclick="performUndo()" data-i18n-title="undo" title="Undo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 10h13a4 4 0 0 1 0 8H9"/>
+                    <polyline points="7,6 3,10 7,14"/>
+                </svg>
+            </button>
+            <button class="toolbar-btn" id="redo-btn" onclick="performRedo()" data-i18n-title="redo" title="Redo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 10H8a4 4 0 0 0 0 8h7"/>
+                    <polyline points="17,6 21,10 17,14"/>
+                </svg>
+            </button>
             <button class="toolbar-btn" onclick="printPreview()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="6,9 6,2 18,2 18,9"/>
@@ -1624,6 +1636,10 @@
                 mermaidDiagrams: "Mermaid Diagrams",
                 mathFormulas: "Math Formulas",
                 sampleInserted: "Sample inserted",
+                undo: "Undo",
+                redo: "Redo",
+                nothingToUndo: "Nothing to undo",
+                nothingToRedo: "Nothing to redo",
                 editor: "Editor",
                 preview: "Preview",
                 editorPlaceholder: "Enter Markdown here...",
@@ -1804,6 +1820,10 @@ Enjoy! 🚀
                 mermaidDiagrams: "Mermaid図",
                 mathFormulas: "数式",
                 sampleInserted: "サンプルを挿入しました",
+                undo: "元に戻す",
+                redo: "やり直す",
+                nothingToUndo: "元に戻す操作がありません",
+                nothingToRedo: "やり直す操作がありません",
                 editor: "エディタ",
                 preview: "プレビュー",
                 editorPlaceholder: "Markdownを入力してください...",
@@ -1984,6 +2004,10 @@ pie title プロジェクトの進捗
                 mermaidDiagrams: "Mermaid 图表",
                 mathFormulas: "数学公式",
                 sampleInserted: "已插入示例",
+                undo: "撤销",
+                redo: "重做",
+                nothingToUndo: "没有可撤销的操作",
+                nothingToRedo: "没有可重做的操作",
                 editor: "编辑器",
                 preview: "预览",
                 editorPlaceholder: "在此输入 Markdown...",
@@ -2217,6 +2241,14 @@ pie title 项目进度
         let isDirty = false;
         let mermaidCounter = 0;
 
+        // Undo/Redo state (unlimited history)
+        let undoStack = [];
+        let redoStack = [];
+        let isUndoRedo = false;
+        let lastSavedState = null;
+        const DEBOUNCE_DELAY = 300; // ms
+        let debounceTimer = null;
+
         // DOM Elements
         const editor = document.getElementById('editor');
         const preview = document.getElementById('preview');
@@ -2254,6 +2286,9 @@ pie title 项目进度
             // Initialize indent size from localStorage
             initIndentSize();
 
+            // Initialize undo/redo
+            initUndoRedo();
+
             updateMermaidTheme();
         });
 
@@ -2290,18 +2325,141 @@ pie title 项目进度
             updateMermaidTheme();
         });
 
+        // Undo/Redo Functions
+        function saveState() {
+            if (isUndoRedo) return;
+
+            const currentState = {
+                content: editor.value,
+                selectionStart: editor.selectionStart,
+                selectionEnd: editor.selectionEnd
+            };
+
+            // Don't save if content hasn't changed
+            if (lastSavedState && lastSavedState.content === currentState.content) {
+                return;
+            }
+
+            undoStack.push(currentState);
+            redoStack = []; // Clear redo stack on new action
+            lastSavedState = currentState;
+            updateUndoRedoButtons();
+        }
+
+        function saveStateDebounced() {
+            if (debounceTimer) {
+                clearTimeout(debounceTimer);
+            }
+            debounceTimer = setTimeout(() => {
+                saveState();
+            }, DEBOUNCE_DELAY);
+        }
+
+        function performUndo() {
+            if (undoStack.length === 0) {
+                showToast(t('nothingToUndo'));
+                return;
+            }
+
+            // Save current state to redo stack
+            const currentState = {
+                content: editor.value,
+                selectionStart: editor.selectionStart,
+                selectionEnd: editor.selectionEnd
+            };
+            redoStack.push(currentState);
+
+            // Restore previous state
+            const prevState = undoStack.pop();
+            isUndoRedo = true;
+            editor.value = prevState.content;
+            editor.selectionStart = prevState.selectionStart;
+            editor.selectionEnd = prevState.selectionEnd;
+            lastSavedState = prevState;
+            isUndoRedo = false;
+
+            updatePreview();
+            updateStats();
+            updateUndoRedoButtons();
+        }
+
+        function performRedo() {
+            if (redoStack.length === 0) {
+                showToast(t('nothingToRedo'));
+                return;
+            }
+
+            // Save current state to undo stack
+            const currentState = {
+                content: editor.value,
+                selectionStart: editor.selectionStart,
+                selectionEnd: editor.selectionEnd
+            };
+            undoStack.push(currentState);
+
+            // Restore next state
+            const nextState = redoStack.pop();
+            isUndoRedo = true;
+            editor.value = nextState.content;
+            editor.selectionStart = nextState.selectionStart;
+            editor.selectionEnd = nextState.selectionEnd;
+            lastSavedState = nextState;
+            isUndoRedo = false;
+
+            updatePreview();
+            updateStats();
+            updateUndoRedoButtons();
+        }
+
+        function updateUndoRedoButtons() {
+            const undoBtn = document.getElementById('undo-btn');
+            const redoBtn = document.getElementById('redo-btn');
+
+            if (undoBtn) {
+                undoBtn.style.opacity = undoStack.length > 0 ? '1' : '0.5';
+            }
+            if (redoBtn) {
+                redoBtn.style.opacity = redoStack.length > 0 ? '1' : '0.5';
+            }
+        }
+
+        function initUndoRedo() {
+            // Save initial state
+            lastSavedState = {
+                content: editor.value,
+                selectionStart: 0,
+                selectionEnd: 0
+            };
+            updateUndoRedoButtons();
+        }
+
         // Editor input handler
         editor.addEventListener('input', () => {
             isDirty = true;
+            saveStateDebounced();
             updatePreview();
             updateStats();
         });
 
-        // Tab key and Enter key support with smart indent
+        // Tab key, Enter key, and Undo/Redo keyboard shortcuts
         editor.addEventListener('keydown', (e) => {
             const start = editor.selectionStart;
             const end = editor.selectionEnd;
             const value = editor.value;
+
+            // Ctrl+Z - Undo
+            if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+                e.preventDefault();
+                performUndo();
+                return;
+            }
+
+            // Ctrl+Y or Ctrl+Shift+Z - Redo
+            if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey) || (e.key === 'Z' && e.shiftKey))) {
+                e.preventDefault();
+                performRedo();
+                return;
+            }
 
             // Enter key - preserve current line's indent
             if (e.key === 'Enter') {
@@ -2317,6 +2475,7 @@ pie title 项目进度
 
                 // Insert newline with the same indent
                 const insertion = '\n' + indent;
+                saveState(); // Save state before change
                 editor.value = value.substring(0, start) + insertion + value.substring(end);
                 editor.selectionStart = editor.selectionEnd = start + insertion.length;
                 updatePreview();
@@ -2326,6 +2485,7 @@ pie title 项目进度
             // Tab key handling
             if (e.key === 'Tab') {
                 e.preventDefault();
+                saveState(); // Save state before change
 
                 // Check if there's a selection spanning multiple lines
                 const selectedText = value.substring(start, end);
