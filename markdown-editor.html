@@ -635,6 +635,28 @@
             height: 14px;
         }
 
+        /* Lazy loading placeholders */
+        .mermaid-placeholder,
+        .math-placeholder {
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+        }
+
+        .lazy-placeholder-text {
+            color: var(--text-secondary);
+            font-style: italic;
+            font-size: 0.9em;
+            opacity: 0.7;
+        }
+
+        .mermaid-placeholder .lazy-placeholder-text {
+            font-family: monospace;
+        }
+
         /* Status Bar */
         .status-bar {
             padding: 8px 20px;
@@ -2433,11 +2455,43 @@ pie title 项目进度
             updateUndoRedoButtons();
         }
 
+        // Preview update scheduling with requestIdleCallback + requestAnimationFrame
+        let previewUpdatePending = false;
+        let previewIdleCallbackId = null;
+        const useIdleCallback = 'requestIdleCallback' in window;
+
+        function schedulePreviewUpdate() {
+            // If update is already pending, skip (coalesce multiple calls)
+            if (previewUpdatePending) return;
+            previewUpdatePending = true;
+
+            // Two-phase scheduling:
+            // 1. Wait for browser idle time (requestIdleCallback)
+            // 2. Sync with next paint frame (requestAnimationFrame)
+            function executeUpdate() {
+                // Use requestAnimationFrame to sync with browser's paint cycle
+                requestAnimationFrame(() => {
+                    previewUpdatePending = false;
+                    previewIdleCallbackId = null;
+                    updatePreview();
+                });
+            }
+
+            // Use requestIdleCallback for non-blocking preview updates
+            // Falls back to setTimeout for Safari compatibility
+            if (useIdleCallback) {
+                previewIdleCallbackId = requestIdleCallback(executeUpdate, { timeout: 500 }); // Max 500ms wait
+            } else {
+                // Fallback for Safari
+                previewIdleCallbackId = setTimeout(executeUpdate, 100);
+            }
+        }
+
         // Editor input handler
         editor.addEventListener('input', () => {
             isDirty = true;
             saveStateDebounced();
-            updatePreview();
+            schedulePreviewUpdate();
             updateStats();
         });
 
@@ -2478,7 +2532,7 @@ pie title 项目进度
                 saveState(); // Save state before change
                 editor.value = value.substring(0, start) + insertion + value.substring(end);
                 editor.selectionStart = editor.selectionEnd = start + insertion.length;
-                updatePreview();
+                schedulePreviewUpdate();
                 return;
             }
 
@@ -2564,7 +2618,7 @@ pie title 项目进度
                         editor.selectionStart = editor.selectionEnd = start + indentSize;
                     }
                 }
-                updatePreview();
+                schedulePreviewUpdate();
                 return;
             }
 
@@ -2588,6 +2642,86 @@ pie title 项目进度
 
         // Cache for KaTeX math - key is the code hash, value is rendered HTML
         const mathCache = new Map(); // code -> html
+
+        // Intersection Observer for lazy rendering
+        let lazyRenderObserver = null;
+
+        function initLazyRenderObserver() {
+            if (lazyRenderObserver) {
+                lazyRenderObserver.disconnect();
+            }
+
+            lazyRenderObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const el = entry.target;
+
+                        if (el.classList.contains('mermaid-lazy')) {
+                            // Render mermaid diagram
+                            renderLazyMermaid(el);
+                        } else if (el.classList.contains('math-lazy')) {
+                            // Render math equation
+                            renderLazyMath(el);
+                        }
+
+                        // Stop observing once rendered
+                        lazyRenderObserver.unobserve(el);
+                    }
+                });
+            }, {
+                root: preview,
+                rootMargin: '100px', // Start rendering slightly before entering viewport
+                threshold: 0
+            });
+        }
+
+        async function renderLazyMermaid(el) {
+            const code = el.getAttribute('data-mermaid-code');
+            const hash = el.getAttribute('data-hash');
+
+            if (!code) return;
+
+            el.textContent = decodeURIComponent(code);
+            el.classList.remove('mermaid-lazy');
+            el.classList.add('mermaid');
+
+            try {
+                await mermaid.run({ nodes: [el] });
+
+                // Cache the rendered SVG
+                if (hash && el.innerHTML.includes('<svg')) {
+                    mermaidCache.set(hash, el.innerHTML);
+                }
+            } catch (error) {
+                console.error('Mermaid lazy rendering error:', error);
+            }
+        }
+
+        function renderLazyMath(el) {
+            const mathSrc = decodeURIComponent(el.getAttribute('data-math-src') || '');
+            const hash = el.getAttribute('data-math-hash');
+            const isBlock = el.classList.contains('math-content');
+
+            if (!mathSrc) return;
+
+            try {
+                const rendered = katex.renderToString(mathSrc, {
+                    displayMode: isBlock,
+                    throwOnError: false,
+                    errorColor: '#cc0000'
+                });
+                el.innerHTML = rendered;
+                el.classList.remove('math-lazy', 'math-to-render');
+                el.classList.add('math-cached');
+
+                // Cache the rendered HTML
+                if (hash) {
+                    mathCache.set(hash, rendered);
+                }
+            } catch (error) {
+                console.error('KaTeX lazy rendering error:', error);
+            }
+        }
 
         // Simple hash function for caching
         function hashCode(str) {
@@ -2681,7 +2815,9 @@ pie title 项目进度
                             SVG
                         </button>
                     </div>
-                    <div class="math-content math-to-render" id="${id}" data-math-hash="${mathHash}" data-math-src="${encodeURIComponent(trimmedMath)}">$$${math}$$</div>
+                    <div class="math-content math-lazy math-placeholder" id="${id}" data-math-hash="${mathHash}" data-math-src="${encodeURIComponent(trimmedMath)}">
+                        <div class="lazy-placeholder-text">$$${math}$$</div>
+                    </div>
                 </div>`;
             });
 
@@ -2697,7 +2833,7 @@ pie title 项目进度
                     return `<span class="math-inline math-cached">${cachedHtml}</span>`;
                 }
 
-                return `<span class="math-inline math-to-render" data-math-hash="${mathHash}" data-math-src="${encodeURIComponent(trimmedMath)}">$${math}$</span>`;
+                return `<span class="math-inline math-lazy" data-math-hash="${mathHash}" data-math-src="${encodeURIComponent(trimmedMath)}">$${math}$</span>`;
             });
 
             // Restore inline code
@@ -2753,7 +2889,7 @@ pie title 项目进度
                     </div>`;
                 }
 
-                // Not cached, need to render
+                // Not cached, need to render (mark as lazy for Intersection Observer)
                 mermaidCodeToRender.push({ id, code: trimmedCode, hash: codeHash });
 
                 return `<div class="mermaid-container" data-mermaid-id="${id}">
@@ -2775,23 +2911,58 @@ pie title 项目进度
                             SVG
                         </button>
                     </div>
-                    <div class="mermaid" id="${id}" data-hash="${codeHash}">${trimmedCode}</div>
+                    <div class="mermaid-lazy mermaid-placeholder" id="${id}" data-hash="${codeHash}" data-mermaid-code="${encodeURIComponent(trimmedCode)}">
+                        <div class="lazy-placeholder-text">Loading diagram...</div>
+                    </div>
                 </div>`;
             });
 
             // Parse markdown
             preview.innerHTML = marked.parse(content);
 
-            // Only render mermaid diagrams that are not cached
-            const uncachedMermaids = preview.querySelectorAll('.mermaid:not(.mermaid-cached)');
-            if (uncachedMermaids.length > 0) {
+            // Initialize lazy render observer
+            initLazyRenderObserver();
+
+            // Helper function to check if element is in viewport
+            function isInViewport(el) {
+                const rect = el.getBoundingClientRect();
+                const previewRect = preview.getBoundingClientRect();
+                return (
+                    rect.top < previewRect.bottom + 100 && // 100px margin
+                    rect.bottom > previewRect.top - 100
+                );
+            }
+
+            // Process mermaid diagrams - render visible ones immediately, lazy-load others
+            const lazyMermaids = preview.querySelectorAll('.mermaid-lazy');
+            const visibleMermaids = [];
+            const offscreenMermaids = [];
+
+            lazyMermaids.forEach(el => {
+                if (isInViewport(el)) {
+                    visibleMermaids.push(el);
+                } else {
+                    offscreenMermaids.push(el);
+                }
+            });
+
+            // Render visible mermaid diagrams immediately
+            if (visibleMermaids.length > 0) {
+                for (const el of visibleMermaids) {
+                    const code = el.getAttribute('data-mermaid-code');
+                    const hash = el.getAttribute('data-hash');
+                    if (code) {
+                        el.textContent = decodeURIComponent(code);
+                        el.classList.remove('mermaid-lazy', 'mermaid-placeholder');
+                        el.classList.add('mermaid');
+                    }
+                }
                 try {
                     await mermaid.run({
-                        nodes: uncachedMermaids
+                        nodes: visibleMermaids
                     });
-
-                    // Cache the rendered SVGs by code hash
-                    uncachedMermaids.forEach(el => {
+                    // Cache rendered SVGs
+                    visibleMermaids.forEach(el => {
                         const hash = el.getAttribute('data-hash');
                         if (hash && el.innerHTML.includes('<svg')) {
                             mermaidCache.set(hash, el.innerHTML);
@@ -2802,33 +2973,44 @@ pie title 项目进度
                 }
             }
 
-            // Only render math that is not cached
-            const uncachedMath = preview.querySelectorAll('.math-to-render');
-            if (uncachedMath.length > 0) {
-                uncachedMath.forEach(el => {
-                    const hash = el.getAttribute('data-math-hash');
+            // Observe offscreen mermaid diagrams for lazy loading
+            offscreenMermaids.forEach(el => {
+                lazyRenderObserver.observe(el);
+            });
+
+            // Process math equations - render visible ones immediately, lazy-load others
+            const lazyMath = preview.querySelectorAll('.math-lazy');
+
+            lazyMath.forEach(el => {
+                if (isInViewport(el)) {
+                    // Render immediately
                     const mathSrc = decodeURIComponent(el.getAttribute('data-math-src') || '');
+                    const hash = el.getAttribute('data-math-hash');
                     const isBlock = el.classList.contains('math-content');
 
-                    try {
-                        const rendered = katex.renderToString(mathSrc, {
-                            displayMode: isBlock,
-                            throwOnError: false,
-                            errorColor: '#cc0000'
-                        });
-                        el.innerHTML = rendered;
-                        el.classList.remove('math-to-render');
-                        el.classList.add('math-cached');
+                    if (mathSrc) {
+                        try {
+                            const rendered = katex.renderToString(mathSrc, {
+                                displayMode: isBlock,
+                                throwOnError: false,
+                                errorColor: '#cc0000'
+                            });
+                            el.innerHTML = rendered;
+                            el.classList.remove('math-lazy', 'math-placeholder');
+                            el.classList.add('math-cached');
 
-                        // Cache the rendered HTML
-                        if (hash) {
-                            mathCache.set(hash, rendered);
+                            if (hash) {
+                                mathCache.set(hash, rendered);
+                            }
+                        } catch (error) {
+                            console.error('KaTeX rendering error:', error);
                         }
-                    } catch (error) {
-                        console.error('KaTeX rendering error:', error);
                     }
-                });
-            }
+                } else {
+                    // Observe for lazy loading
+                    lazyRenderObserver.observe(el);
+                }
+            });
 
             // Restore scroll position
             if (wasAtBottom) {
@@ -3625,7 +3807,7 @@ timeline
             saveState();
 
             isDirty = true;
-            updatePreview();
+            schedulePreviewUpdate();
             updateStats();
             closeSampleModal();
             showToast(t('sampleInserted'));

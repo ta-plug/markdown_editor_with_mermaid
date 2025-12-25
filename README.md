@@ -133,6 +133,11 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📝 Changelog
 
+### v1.2.4
+- Performance: requestIdleCallback for non-blocking preview updates
+- Performance: Intersection Observer for lazy rendering (offscreen diagrams/equations render on scroll)
+- Performance: requestAnimationFrame for smooth frame-synced updates
+
 ### v1.2.3
 - Performance: KaTeX math equation caching (unchanged equations skip re-rendering)
 
