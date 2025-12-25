@@ -431,7 +431,7 @@
 
         /* Markdown Styles */
         #preview h1 {
-            font-size: 2rem;
+            font-size: 2em;
             font-weight: 700;
             margin: 1.5em 0 0.5em;
             padding-bottom: 0.3em;
@@ -444,7 +444,7 @@
         }
 
         #preview h2 {
-            font-size: 1.5rem;
+            font-size: 1.5em;
             font-weight: 600;
             margin: 1.3em 0 0.4em;
             color: var(--text-primary);
@@ -453,14 +453,14 @@
         }
 
         #preview h3 {
-            font-size: 1.25rem;
+            font-size: 1.25em;
             font-weight: 600;
             margin: 1.2em 0 0.4em;
             color: var(--accent);
         }
 
         #preview h4, #preview h5, #preview h6 {
-            font-size: 1rem;
+            font-size: 1em;
             font-weight: 600;
             margin: 1em 0 0.4em;
             color: var(--text-secondary);
@@ -1050,6 +1050,157 @@
             font-weight: bold;
         }
 
+        /* Font Settings */
+        .font-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            height: 44px;
+            padding: 0 12px;
+            border-radius: 22px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+            position: relative;
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .font-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .font-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .font-popup {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 10px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+            z-index: 200;
+            min-width: 280px;
+        }
+
+        .font-popup.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .font-popup-section {
+            margin-bottom: 16px;
+        }
+
+        .font-popup-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .font-popup-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .font-popup-title svg {
+            width: 14px;
+            height: 14px;
+            stroke: var(--text-muted);
+        }
+
+        .font-setting-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .font-setting-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .font-setting-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .font-select {
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-size: 0.8rem;
+            cursor: pointer;
+            min-width: 130px;
+        }
+
+        .font-select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .font-size-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .font-size-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+
+        .font-size-btn:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .font-size-value {
+            min-width: 50px;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .font-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 12px 0;
+        }
+
         /* Sample Code Modal */
         .modal-overlay {
             position: fixed;
@@ -1556,6 +1707,78 @@
                     <div class="indent-option active" data-size="2" onclick="setIndentSize(2)">2 spaces</div>
                     <div class="indent-option" data-size="4" onclick="setIndentSize(4)">4 spaces</div>
                     <div class="indent-option" data-size="8" onclick="setIndentSize(8)">8 spaces</div>
+                </div>
+            </div>
+        </div>
+
+        <div style="position: relative;">
+            <button class="font-btn" onclick="toggleFontPopup()" title="Font Settings">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="4 7 4 4 20 4 20 7"/>
+                    <line x1="9" y1="20" x2="15" y2="20"/>
+                    <line x1="12" y1="4" x2="12" y2="20"/>
+                </svg>
+                <span>Aa</span>
+            </button>
+            <div class="font-popup" id="font-popup">
+                <!-- Editor Font Settings -->
+                <div class="font-popup-section">
+                    <div class="font-popup-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="16,18 22,12 16,6"/>
+                            <polyline points="8,6 2,12 8,18"/>
+                        </svg>
+                        Editor
+                    </div>
+                    <div class="font-setting-row">
+                        <span class="font-setting-label">Font</span>
+                        <select class="font-select" id="editor-font-family" onchange="setEditorFontFamily(this.value)">
+                            <option value="'JetBrains Mono', monospace">JetBrains Mono</option>
+                            <option value="'Consolas', monospace">Consolas</option>
+                            <option value="'Fira Code', monospace">Fira Code</option>
+                            <option value="'Source Code Pro', monospace">Source Code Pro</option>
+                            <option value="monospace">System Mono</option>
+                        </select>
+                    </div>
+                    <div class="font-setting-row">
+                        <span class="font-setting-label">Size</span>
+                        <div class="font-size-control">
+                            <button class="font-size-btn" onclick="adjustEditorFontSize(-1)">−</button>
+                            <span class="font-size-value" id="editor-font-size-display">14px</span>
+                            <button class="font-size-btn" onclick="adjustEditorFontSize(1)">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="font-divider"></div>
+
+                <!-- Preview Font Settings -->
+                <div class="font-popup-section">
+                    <div class="font-popup-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                        Preview
+                    </div>
+                    <div class="font-setting-row">
+                        <span class="font-setting-label">Font</span>
+                        <select class="font-select" id="preview-font-family" onchange="setPreviewFontFamily(this.value)">
+                            <option value="'Noto Sans JP', 'Noto Sans SC', sans-serif">Noto Sans</option>
+                            <option value="'Segoe UI', sans-serif">Segoe UI</option>
+                            <option value="'Helvetica Neue', Arial, sans-serif">Helvetica</option>
+                            <option value="Georgia, serif">Georgia</option>
+                            <option value="system-ui, sans-serif">System UI</option>
+                        </select>
+                    </div>
+                    <div class="font-setting-row">
+                        <span class="font-setting-label">Size</span>
+                        <div class="font-size-control">
+                            <button class="font-size-btn" onclick="adjustPreviewFontSize(-1)">−</button>
+                            <span class="font-size-value" id="preview-font-size-display">16px</span>
+                            <button class="font-size-btn" onclick="adjustPreviewFontSize(1)">+</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -2310,6 +2533,9 @@ pie title 项目进度
 
             // Initialize undo/redo
             initUndoRedo();
+
+            // Initialize font settings
+            initFontSettings();
 
             updateMermaidTheme();
         });
@@ -3179,7 +3405,76 @@ pie title 项目进度
             if (!e.target.closest('.indent-btn') && !e.target.closest('.indent-popup')) {
                 document.getElementById('indent-popup').classList.remove('open');
             }
+            if (!e.target.closest('.font-btn') && !e.target.closest('.font-popup')) {
+                document.getElementById('font-popup').classList.remove('open');
+            }
         });
+
+        // Font settings
+        let editorFontSize = parseInt(localStorage.getItem('editorFontSize')) || 14;
+        let editorFontFamily = localStorage.getItem('editorFontFamily') || "'JetBrains Mono', monospace";
+        let previewFontSize = parseInt(localStorage.getItem('previewFontSize')) || 16;
+        let previewFontFamily = localStorage.getItem('previewFontFamily') || "'Noto Sans JP', 'Noto Sans SC', sans-serif";
+
+        function toggleFontPopup() {
+            document.getElementById('font-popup').classList.toggle('open');
+        }
+
+        function setEditorFontFamily(family) {
+            editorFontFamily = family;
+            localStorage.setItem('editorFontFamily', family);
+            editor.style.fontFamily = family;
+        }
+
+        function adjustEditorFontSize(delta) {
+            editorFontSize = Math.max(10, Math.min(24, editorFontSize + delta));
+            localStorage.setItem('editorFontSize', editorFontSize);
+            editor.style.fontSize = editorFontSize + 'px';
+            document.getElementById('editor-font-size-display').textContent = editorFontSize + 'px';
+        }
+
+        function setPreviewFontFamily(family) {
+            previewFontFamily = family;
+            localStorage.setItem('previewFontFamily', family);
+            preview.style.fontFamily = family;
+        }
+
+        function adjustPreviewFontSize(delta) {
+            previewFontSize = Math.max(12, Math.min(28, previewFontSize + delta));
+            localStorage.setItem('previewFontSize', previewFontSize);
+            preview.style.fontSize = previewFontSize + 'px';
+            document.getElementById('preview-font-size-display').textContent = previewFontSize + 'px';
+        }
+
+        function initFontSettings() {
+            // Apply saved settings
+            editor.style.fontFamily = editorFontFamily;
+            editor.style.fontSize = editorFontSize + 'px';
+            preview.style.fontFamily = previewFontFamily;
+            preview.style.fontSize = previewFontSize + 'px';
+
+            // Update UI
+            document.getElementById('editor-font-size-display').textContent = editorFontSize + 'px';
+            document.getElementById('preview-font-size-display').textContent = previewFontSize + 'px';
+
+            // Set select values
+            const editorFontSelect = document.getElementById('editor-font-family');
+            const previewFontSelect = document.getElementById('preview-font-family');
+
+            // Find and select matching option
+            for (let option of editorFontSelect.options) {
+                if (option.value === editorFontFamily) {
+                    option.selected = true;
+                    break;
+                }
+            }
+            for (let option of previewFontSelect.options) {
+                if (option.value === previewFontFamily) {
+                    option.selected = true;
+                    break;
+                }
+            }
+        }
 
         // Indent size setting
         let indentSize = parseInt(localStorage.getItem('indentSize')) || 2;

@@ -133,6 +133,14 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📝 Changelog
 
+### v1.3.0
+- Font customization for Editor and Preview panels
+  - Font family selection (5 options each)
+  - Font size adjustment with +/- buttons
+  - Separate settings for Editor and Preview
+  - Settings persist via LocalStorage
+- Fix: Headings (h1-h6) now scale properly with preview font size
+
 ### v1.2.5
 - Fix: Cursor now stays visible after pressing Enter at end of document
 
