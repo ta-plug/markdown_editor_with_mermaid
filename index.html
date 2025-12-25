@@ -3611,7 +3611,27 @@ pie title 项目进度
 
         // Print
         function printPreview() {
-            window.print();
+            // Render all lazy math equations before printing
+            const lazyMathElements = preview.querySelectorAll('.math-lazy');
+            lazyMathElements.forEach(el => {
+                renderLazyMath(el);
+            });
+
+            // Render all lazy mermaid diagrams before printing
+            const lazyMermaidElements = preview.querySelectorAll('.mermaid-lazy');
+            const mermaidPromises = Array.from(lazyMermaidElements).map(el => {
+                return new Promise(resolve => {
+                    renderLazyMermaid(el);
+                    resolve();
+                });
+            });
+
+            // Wait a moment for rendering to complete, then print
+            Promise.all(mermaidPromises).then(() => {
+                setTimeout(() => {
+                    window.print();
+                }, 100);
+            });
         }
 
         // Mermaid export functions

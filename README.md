@@ -133,6 +133,9 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📝 Changelog
 
+### v1.3.1
+- Fix: Math equations and Mermaid diagrams now render correctly when printing
+
 ### v1.3.0
 - Font customization for Editor and Preview panels
   - Font family selection (5 options each)
