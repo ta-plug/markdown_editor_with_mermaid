@@ -8,6 +8,10 @@ A feature-rich, browser-based Markdown editor with real-time preview, Mermaid di
 - **Split View**: Resizable editor and preview panels
 - **Mermaid Diagrams**: Full support for flowcharts, sequence diagrams, class diagrams, pie charts, and more
 - **Diagram Export**: Download Mermaid diagrams as PNG or SVG
+- **Math Equations**: LaTeX/TeX math rendering with KaTeX
+  - Inline math: `$E=mc^2$`
+  - Block math: `$$\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}$$`
+  - Export equations as PNG or SVG
 - **Syntax Highlighting**: Code blocks with automatic language detection
 - **File Operations**: Open, save, and create Markdown files
 - **Theme Support**: 
@@ -61,6 +65,20 @@ flowchart TD
 
 Hover over any rendered diagram to reveal PNG/SVG download buttons.
 
+### Math Equations
+Write mathematical expressions using LaTeX syntax:
+
+```markdown
+Inline math: $E=mc^2$
+
+Block math:
+$$
+\frac{-b \pm \sqrt{b^2-4ac}}{2a}
+$$
+```
+
+Hover over block equations to download them as PNG or SVG.
+
 ### Customizing Appearance
 - **Theme Toggle**: Click the sun/moon icon (top right) to switch between light and dark modes
 - **Color Theme**: Click the palette icon to choose from 8 accent colors
@@ -81,6 +99,7 @@ If you plan to use this editor with untrusted content, consider adding [DOMPurif
 - [Marked.js](https://marked.js.org/) - Markdown parser
 - [Highlight.js](https://highlightjs.org/) - Syntax highlighting
 - [Mermaid.js](https://mermaid.js.org/) - Diagram generation
+- [KaTeX](https://katex.org/) - Math equation rendering
 - [html2canvas](https://html2canvas.hertzen.com/) - PNG export functionality
 - [Google Fonts](https://fonts.google.com/) - JetBrains Mono & Noto Sans JP
 
@@ -101,6 +120,11 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 5. Open a Pull Request
 
 ## 📝 Changelog
+
+### v1.1.0
+- Math equation support with KaTeX (inline and block)
+- Math equation export as PNG/SVG
+- Equation counter in status bar
 
 ### v1.0.1
 - Multilingual support (English, Chinese, Japanese)
