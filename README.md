@@ -133,6 +133,11 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📝 Changelog
 
+### v1.2.2
+- Fix: Preview scroll position now preserved during editing
+- Fix: Undo now works correctly after sample code insertion
+- Performance: Mermaid diagram caching (unchanged diagrams skip re-rendering)
+
 ### v1.2.1
 - Unlimited Undo/Redo functionality
 - Keyboard shortcuts: Ctrl+Z (Undo), Ctrl+Y or Ctrl+Shift+Z (Redo)
