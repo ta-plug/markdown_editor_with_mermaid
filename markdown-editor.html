@@ -592,8 +592,8 @@
         }
 
         .mermaid-container svg {
-            max-width: 100%;
-            height: auto;
+            display: block;
+            margin: 0 auto;
         }
 
         .mermaid-actions {
@@ -758,9 +758,10 @@
                 border: 1px solid #ccc !important;
             }
 
-            .mermaid svg {
-                max-width: 100% !important;
-                height: auto !important;
+            .mermaid-container .mermaid,
+            .mermaid-container .mermaid-cached {
+                display: flex !important;
+                justify-content: center !important;
             }
         }
 

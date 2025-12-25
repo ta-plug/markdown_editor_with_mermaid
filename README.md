@@ -133,6 +133,9 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📝 Changelog
 
+### v1.3.2
+- Fix: Mermaid diagrams now print at correct size (no more abnormal scaling)
+
 ### v1.3.1
 - Fix: Math equations and Mermaid diagrams now render correctly when printing
 
