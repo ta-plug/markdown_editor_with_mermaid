@@ -136,6 +136,9 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📝 Changelog
 
+### v2.0.2
+- Fix: Math equation SVG export now captures full content (including right-hand side of equations)
+
 ### v2.0.1
 - **Math Equation Highlighting**: Block math (`$$...$$`) content now highlighted in editor
   - Single-line block math (`$$formula$$`) supported

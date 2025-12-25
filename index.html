@@ -4073,21 +4073,44 @@ pie title 项目进度
                 const svgNS = "http://www.w3.org/2000/svg";
                 const svg = document.createElementNS(svgNS, "svg");
 
-                // Get bounding box
+                // Get bounding box - use scrollWidth/scrollHeight for full content size
+                // Also check all child elements to get the true bounding box
                 const bbox = katexElement.getBoundingClientRect();
+                const katexHtml = katexElement.querySelector('.katex-html');
+
+                // Calculate actual width including all positioned elements
+                let actualWidth = bbox.width;
+                let actualHeight = bbox.height;
+
+                if (katexHtml) {
+                    // Get all child elements and find the maximum extent
+                    const children = katexHtml.querySelectorAll('*');
+                    children.forEach(child => {
+                        const childRect = child.getBoundingClientRect();
+                        const rightEdge = childRect.right - bbox.left;
+                        const bottomEdge = childRect.bottom - bbox.top;
+                        if (rightEdge > actualWidth) actualWidth = rightEdge;
+                        if (bottomEdge > actualHeight) actualHeight = bottomEdge;
+                    });
+                }
+
+                // Add extra buffer for any overflow
+                actualWidth = Math.max(actualWidth, katexElement.scrollWidth) + 10;
+                actualHeight = Math.max(actualHeight, katexElement.scrollHeight) + 10;
+
                 const padding = 20;
 
                 svg.setAttribute("xmlns", svgNS);
-                svg.setAttribute("width", bbox.width + padding * 2);
-                svg.setAttribute("height", bbox.height + padding * 2);
-                svg.setAttribute("viewBox", `0 0 ${bbox.width + padding * 2} ${bbox.height + padding * 2}`);
+                svg.setAttribute("width", actualWidth + padding * 2);
+                svg.setAttribute("height", actualHeight + padding * 2);
+                svg.setAttribute("viewBox", `0 0 ${actualWidth + padding * 2} ${actualHeight + padding * 2}`);
 
                 // Create foreignObject to embed HTML
                 const foreignObject = document.createElementNS(svgNS, "foreignObject");
                 foreignObject.setAttribute("x", padding);
                 foreignObject.setAttribute("y", padding);
-                foreignObject.setAttribute("width", bbox.width);
-                foreignObject.setAttribute("height", bbox.height);
+                foreignObject.setAttribute("width", actualWidth);
+                foreignObject.setAttribute("height", actualHeight);
 
                 // Clone the KaTeX element and include necessary styles
                 const clonedKatex = katexElement.cloneNode(true);
