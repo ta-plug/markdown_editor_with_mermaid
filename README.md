@@ -133,6 +133,9 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📝 Changelog
 
+### v1.2.3
+- Performance: KaTeX math equation caching (unchanged equations skip re-rendering)
+
 ### v1.2.2
 - Fix: Preview scroll position now preserved during editing
 - Fix: Undo now works correctly after sample code insertion

@@ -2586,6 +2586,9 @@ pie title 项目进度
         // Cache for Mermaid diagrams - key is the code hash, value is SVG
         const mermaidCache = new Map(); // code -> svg
 
+        // Cache for KaTeX math - key is the code hash, value is rendered HTML
+        const mathCache = new Map(); // code -> html
+
         // Simple hash function for caching
         function hashCode(str) {
             let hash = 0;
@@ -2630,6 +2633,35 @@ pie title 项目进度
             mathCounter += blockMathMatches.length;
             content = content.replace(/\$\$([\s\S]*?)\$\$/g, (match, math) => {
                 const id = `math-${mathBlockCounter++}`;
+                const trimmedMath = math.trim();
+                const mathHash = hashCode(trimmedMath + '_block');
+                const cachedHtml = mathCache.get(mathHash);
+
+                if (cachedHtml) {
+                    // Use cached rendered math
+                    return `<div class="math-container" data-math-id="${id}">
+                        <div class="math-actions">
+                            <button class="math-action-btn" onclick="downloadMathPNG('${id}')">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                                    <polyline points="21,15 16,10 5,21"/>
+                                </svg>
+                                PNG
+                            </button>
+                            <button class="math-action-btn" onclick="downloadMathSVG('${id}')">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="12,2 2,7 12,12 22,7 12,2"/>
+                                    <polyline points="2,17 12,22 22,17"/>
+                                    <polyline points="2,12 12,17 22,12"/>
+                                </svg>
+                                SVG
+                            </button>
+                        </div>
+                        <div class="math-content math-cached" id="${id}">${cachedHtml}</div>
+                    </div>`;
+                }
+
                 return `<div class="math-container" data-math-id="${id}">
                     <div class="math-actions">
                         <button class="math-action-btn" onclick="downloadMathPNG('${id}')">
@@ -2649,7 +2681,7 @@ pie title 项目进度
                             SVG
                         </button>
                     </div>
-                    <div class="math-content" id="${id}">$$${math}$$</div>
+                    <div class="math-content math-to-render" id="${id}" data-math-hash="${mathHash}" data-math-src="${encodeURIComponent(trimmedMath)}">$$${math}$$</div>
                 </div>`;
             });
 
@@ -2657,7 +2689,15 @@ pie title 项目进度
             const inlineMathMatches = content.match(/(?<!\$)\$(?!\$)([^\$\n]+?)\$(?!\$)/g) || [];
             mathCounter += inlineMathMatches.length;
             content = content.replace(/(?<!\$)\$(?!\$)([^\$\n]+?)\$(?!\$)/g, (match, math) => {
-                return `<span class="math-inline">$${math}$</span>`;
+                const trimmedMath = math.trim();
+                const mathHash = hashCode(trimmedMath + '_inline');
+                const cachedHtml = mathCache.get(mathHash);
+
+                if (cachedHtml) {
+                    return `<span class="math-inline math-cached">${cachedHtml}</span>`;
+                }
+
+                return `<span class="math-inline math-to-render" data-math-hash="${mathHash}" data-math-src="${encodeURIComponent(trimmedMath)}">$${math}$</span>`;
             });
 
             // Restore inline code
@@ -2762,18 +2802,32 @@ pie title 项目进度
                 }
             }
 
-            // Render math with KaTeX
-            try {
-                renderMathInElement(preview, {
-                    delimiters: [
-                        {left: '$$', right: '$$', display: true},
-                        {left: '$', right: '$', display: false}
-                    ],
-                    throwOnError: false,
-                    errorColor: '#cc0000'
+            // Only render math that is not cached
+            const uncachedMath = preview.querySelectorAll('.math-to-render');
+            if (uncachedMath.length > 0) {
+                uncachedMath.forEach(el => {
+                    const hash = el.getAttribute('data-math-hash');
+                    const mathSrc = decodeURIComponent(el.getAttribute('data-math-src') || '');
+                    const isBlock = el.classList.contains('math-content');
+
+                    try {
+                        const rendered = katex.renderToString(mathSrc, {
+                            displayMode: isBlock,
+                            throwOnError: false,
+                            errorColor: '#cc0000'
+                        });
+                        el.innerHTML = rendered;
+                        el.classList.remove('math-to-render');
+                        el.classList.add('math-cached');
+
+                        // Cache the rendered HTML
+                        if (hash) {
+                            mathCache.set(hash, rendered);
+                        }
+                    } catch (error) {
+                        console.error('KaTeX rendering error:', error);
+                    }
                 });
-            } catch (error) {
-                console.error('KaTeX rendering error:', error);
             }
 
             // Restore scroll position
