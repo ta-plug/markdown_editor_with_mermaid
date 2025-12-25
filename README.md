@@ -17,6 +17,9 @@ A feature-rich, browser-based Markdown editor with real-time preview, Mermaid di
 - **Theme Support**: 
   - Light/Dark mode toggle
   - 8 customizable accent color themes (Indigo, Blue, Cyan, Emerald, Amber, Rose, Violet, Slate)
+- **Sample Code Templates**: Quick insertion of Mermaid diagrams and math formulas
+  - 10 Mermaid diagram types (Flowchart, Sequence, Class, State, ER, Gantt, Pie, Git Graph, Mindmap, Timeline)
+  - 12 Math formula templates (fractions, integrals, matrices, and more)
 - **Print Support**: Print preview content with optimized styling
 - **Persistent Settings**: Theme preferences saved to localStorage
 - **Keyboard Shortcuts**:
@@ -127,6 +130,12 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 5. Open a Pull Request
 
 ## 📝 Changelog
+
+### v1.2.0
+- Sample code insertion feature with modal dialog
+- 10 Mermaid diagram templates with live preview
+- 12 Math formula templates with rendered preview
+- Tabbed interface for easy navigation between diagram and formula samples
 
 ### v1.1.1
 - Smart indent: Auto-preserve indentation on Enter

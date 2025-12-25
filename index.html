@@ -1027,7 +1027,173 @@
             content: '✓';
             font-weight: bold;
         }
-    
+
+        /* Sample Code Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.open .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .modal-close svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .modal-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+        }
+
+        .modal-tab {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+            transition: all 0.2s ease;
+        }
+
+        .modal-tab:hover {
+            color: var(--text-primary);
+        }
+
+        .modal-tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .modal-body {
+            padding: 24px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .sample-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .sample-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .sample-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .sample-card-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .sample-card-preview {
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .sample-card-preview .mermaid {
+            font-size: 10px;
+            transform: scale(0.6);
+            transform-origin: center;
+        }
+
+        .sample-card-preview .katex {
+            font-size: 0.9rem;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
         /* Language Popup */
         .lang-popup {
             position: absolute;
@@ -1276,8 +1442,17 @@
                 </svg>
                 <span data-i18n="print">Print</span>
             </button>
+            <button class="toolbar-btn" onclick="openSampleModal()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="9" y1="9" x2="15" y2="9"/>
+                    <line x1="9" y1="13" x2="15" y2="13"/>
+                    <line x1="9" y1="17" x2="12" y2="17"/>
+                </svg>
+                <span data-i18n="samples">Samples</span>
+            </button>
         </div>
-        
+
         <div class="spacer"></div>
         
         <!-- Language Selector -->
@@ -1444,6 +1619,11 @@
                 save: "Save",
                 saveAs: "Save As",
                 print: "Print",
+                samples: "Samples",
+                sampleCode: "Sample Code",
+                mermaidDiagrams: "Mermaid Diagrams",
+                mathFormulas: "Math Formulas",
+                sampleInserted: "Sample inserted",
                 editor: "Editor",
                 preview: "Preview",
                 editorPlaceholder: "Enter Markdown here...",
@@ -1619,6 +1799,11 @@ Enjoy! 🚀
                 save: "上書き保存",
                 saveAs: "名前を付けて保存",
                 print: "印刷",
+                samples: "サンプル",
+                sampleCode: "サンプルコード",
+                mermaidDiagrams: "Mermaid図",
+                mathFormulas: "数式",
+                sampleInserted: "サンプルを挿入しました",
                 editor: "エディタ",
                 preview: "プレビュー",
                 editorPlaceholder: "Markdownを入力してください...",
@@ -1794,6 +1979,11 @@ pie title プロジェクトの進捗
                 save: "保存",
                 saveAs: "另存为",
                 print: "打印",
+                samples: "示例",
+                sampleCode: "示例代码",
+                mermaidDiagrams: "Mermaid 图表",
+                mathFormulas: "数学公式",
+                sampleInserted: "已插入示例",
                 editor: "编辑器",
                 preview: "预览",
                 editorPlaceholder: "在此输入 Markdown...",
@@ -2825,10 +3015,325 @@ pie title 项目进度
             const toast = document.getElementById('toast');
             toast.textContent = message;
             toast.classList.add('show');
-            
+
             setTimeout(() => {
                 toast.classList.remove('show');
             }, 3000);
+        }
+
+        // ==================== Sample Code Modal ====================
+        const mermaidSamples = [
+            {
+                name: { en: 'Flowchart', ja: 'フローチャート', zh: '流程图' },
+                code: `\`\`\`mermaid
+flowchart TD
+    A[Start] --> B{Decision}
+    B -->|Yes| C[Process A]
+    B -->|No| D[Process B]
+    C --> E[End]
+    D --> E
+\`\`\``
+            },
+            {
+                name: { en: 'Sequence Diagram', ja: 'シーケンス図', zh: '时序图' },
+                code: `\`\`\`mermaid
+sequenceDiagram
+    participant A as Alice
+    participant B as Bob
+    A->>B: Hello Bob!
+    B-->>A: Hi Alice!
+    A->>B: How are you?
+    B-->>A: I'm fine, thanks!
+\`\`\``
+            },
+            {
+                name: { en: 'Class Diagram', ja: 'クラス図', zh: '类图' },
+                code: `\`\`\`mermaid
+classDiagram
+    Animal <|-- Duck
+    Animal <|-- Fish
+    Animal : +int age
+    Animal : +String gender
+    Animal: +isMammal()
+    Duck : +String beakColor
+    Duck : +swim()
+    Fish : -int sizeInFeet
+    Fish : +canEat()
+\`\`\``
+            },
+            {
+                name: { en: 'State Diagram', ja: '状態図', zh: '状态图' },
+                code: `\`\`\`mermaid
+stateDiagram-v2
+    [*] --> Idle
+    Idle --> Processing : Start
+    Processing --> Complete : Success
+    Processing --> Error : Failure
+    Complete --> [*]
+    Error --> Idle : Retry
+\`\`\``
+            },
+            {
+                name: { en: 'Entity Relationship', ja: 'ER図', zh: 'ER图' },
+                code: `\`\`\`mermaid
+erDiagram
+    CUSTOMER ||--o{ ORDER : places
+    ORDER ||--|{ LINE-ITEM : contains
+    CUSTOMER {
+        string name
+        string email
+    }
+    ORDER {
+        int orderNumber
+        date created
+    }
+    LINE-ITEM {
+        string product
+        int quantity
+    }
+\`\`\``
+            },
+            {
+                name: { en: 'Gantt Chart', ja: 'ガントチャート', zh: '甘特图' },
+                code: `\`\`\`mermaid
+gantt
+    title Project Schedule
+    dateFormat YYYY-MM-DD
+    section Planning
+    Requirements :a1, 2024-01-01, 7d
+    Design       :a2, after a1, 5d
+    section Development
+    Coding       :a3, after a2, 14d
+    Testing      :a4, after a3, 7d
+\`\`\``
+            },
+            {
+                name: { en: 'Pie Chart', ja: '円グラフ', zh: '饼图' },
+                code: `\`\`\`mermaid
+pie title Browser Market Share
+    "Chrome" : 65
+    "Safari" : 19
+    "Firefox" : 4
+    "Edge" : 4
+    "Other" : 8
+\`\`\``
+            },
+            {
+                name: { en: 'Git Graph', ja: 'Gitグラフ', zh: 'Git图' },
+                code: `\`\`\`mermaid
+gitGraph
+    commit
+    commit
+    branch develop
+    checkout develop
+    commit
+    commit
+    checkout main
+    merge develop
+    commit
+\`\`\``
+            },
+            {
+                name: { en: 'Mindmap', ja: 'マインドマップ', zh: '思维导图' },
+                code: `\`\`\`mermaid
+mindmap
+  root((Project))
+    Planning
+      Requirements
+      Design
+    Development
+      Frontend
+      Backend
+    Testing
+      Unit Tests
+      Integration
+\`\`\``
+            },
+            {
+                name: { en: 'Timeline', ja: 'タイムライン', zh: '时间线' },
+                code: `\`\`\`mermaid
+timeline
+    title Project History
+    2020 : Project Started
+    2021 : Version 1.0 Released
+    2022 : Major Update
+         : New Features Added
+    2023 : Version 2.0 Released
+\`\`\``
+            }
+        ];
+
+        const mathSamples = [
+            {
+                name: { en: 'Superscript', ja: '上付き文字', zh: '上标' },
+                code: `$$x^2 + y^2 = z^2$$`
+            },
+            {
+                name: { en: 'Subscript', ja: '下付き文字', zh: '下标' },
+                code: `$$a_1, a_2, a_3, \\ldots, a_n$$`
+            },
+            {
+                name: { en: 'Fraction', ja: '分数', zh: '分数' },
+                code: `$$\\frac{a}{b} + \\frac{c}{d} = \\frac{ad + bc}{bd}$$`
+            },
+            {
+                name: { en: 'Quadratic Formula', ja: '二次方程式の解', zh: '二次方程求根公式' },
+                code: `$$x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$$`
+            },
+            {
+                name: { en: 'Integral', ja: '積分', zh: '积分' },
+                code: `$$\\int_{a}^{b} f(x) \\, dx = F(b) - F(a)$$`
+            },
+            {
+                name: { en: 'Derivative', ja: '微分', zh: '微分' },
+                code: `$$\\frac{d}{dx} f(x) = \\lim_{h \\to 0} \\frac{f(x+h) - f(x)}{h}$$`
+            },
+            {
+                name: { en: 'Summation', ja: '総和記号', zh: '求和符号' },
+                code: `$$\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}$$`
+            },
+            {
+                name: { en: 'Product', ja: '総乗記号', zh: '连乘符号' },
+                code: `$$\\prod_{i=1}^{n} i = n!$$`
+            },
+            {
+                name: { en: 'Matrix', ja: '行列', zh: '矩阵' },
+                code: `$$\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix} \\begin{pmatrix} x \\\\ y \\end{pmatrix} = \\begin{pmatrix} ax + by \\\\ cx + dy \\end{pmatrix}$$`
+            },
+            {
+                name: { en: 'Determinant', ja: '行列式', zh: '行列式' },
+                code: `$$\\det(A) = \\begin{vmatrix} a & b \\\\ c & d \\end{vmatrix} = ad - bc$$`
+            },
+            {
+                name: { en: 'System of Equations', ja: '連立方程式', zh: '方程组' },
+                code: `$$\\begin{cases} ax + by = e \\\\ cx + dy = f \\end{cases}$$`
+            },
+            {
+                name: { en: 'Limit', ja: '極限', zh: '极限' },
+                code: `$$\\lim_{x \\to \\infty} \\left(1 + \\frac{1}{x}\\right)^x = e$$`
+            }
+        ];
+
+        function openSampleModal() {
+            const modal = document.getElementById('sample-modal');
+            modal.classList.add('open');
+            renderSampleCards();
+        }
+
+        function closeSampleModal(event) {
+            if (event && event.target !== event.currentTarget) return;
+            document.getElementById('sample-modal').classList.remove('open');
+        }
+
+        function switchSampleTab(tab) {
+            // Update tab buttons
+            document.querySelectorAll('.modal-tab').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === tab);
+            });
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.toggle('active', content.id === `tab-${tab}`);
+            });
+        }
+
+        function renderSampleCards() {
+            renderMermaidSamples();
+            renderMathSamples();
+        }
+
+        async function renderMermaidSamples() {
+            const container = document.getElementById('mermaid-samples');
+            container.innerHTML = '';
+
+            for (let i = 0; i < mermaidSamples.length; i++) {
+                const sample = mermaidSamples[i];
+                const card = document.createElement('div');
+                card.className = 'sample-card';
+                card.onclick = () => insertSample(sample.code);
+
+                const title = document.createElement('div');
+                title.className = 'sample-card-title';
+                title.textContent = sample.name[currentLang] || sample.name.en;
+
+                const preview = document.createElement('div');
+                preview.className = 'sample-card-preview';
+
+                // Extract mermaid code from the markdown code block
+                const mermaidCode = sample.code.replace(/```mermaid\n?/, '').replace(/\n?```$/, '');
+                const mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = mermaidCode;
+                preview.appendChild(mermaidDiv);
+
+                card.appendChild(title);
+                card.appendChild(preview);
+                container.appendChild(card);
+            }
+
+            // Re-render mermaid diagrams
+            try {
+                await mermaid.run({ nodes: container.querySelectorAll('.mermaid') });
+            } catch (e) {
+                console.log('Mermaid render error in modal:', e);
+            }
+        }
+
+        function renderMathSamples() {
+            const container = document.getElementById('math-samples');
+            container.innerHTML = '';
+
+            mathSamples.forEach(sample => {
+                const card = document.createElement('div');
+                card.className = 'sample-card';
+                card.onclick = () => insertSample(sample.code);
+
+                const title = document.createElement('div');
+                title.className = 'sample-card-title';
+                title.textContent = sample.name[currentLang] || sample.name.en;
+
+                const preview = document.createElement('div');
+                preview.className = 'sample-card-preview';
+
+                // Render KaTeX
+                const mathCode = sample.code.replace(/^\$\$/, '').replace(/\$\$$/, '');
+                try {
+                    preview.innerHTML = katex.renderToString(mathCode, {
+                        throwOnError: false,
+                        displayMode: true
+                    });
+                } catch (e) {
+                    preview.textContent = sample.code;
+                }
+
+                card.appendChild(title);
+                card.appendChild(preview);
+                container.appendChild(card);
+            });
+        }
+
+        function insertSample(code) {
+            const start = editor.selectionStart;
+            const end = editor.selectionEnd;
+            const value = editor.value;
+
+            // Add newlines if not at beginning or if there's content before
+            let insertion = code;
+            if (start > 0 && value[start - 1] !== '\n') {
+                insertion = '\n\n' + insertion;
+            }
+            if (end < value.length && value[end] !== '\n') {
+                insertion = insertion + '\n\n';
+            }
+
+            editor.value = value.substring(0, start) + insertion + value.substring(end);
+            editor.selectionStart = editor.selectionEnd = start + insertion.length;
+
+            isDirty = true;
+            updatePreview();
+            updateStats();
+            closeSampleModal();
+            showToast(t('sampleInserted'));
+            editor.focus();
         }
 
         // Warn before leaving with unsaved changes
@@ -2840,5 +3345,36 @@ pie title 项目进度
         });
     
     </script>
+
+    <!-- Sample Code Modal -->
+    <div class="modal-overlay" id="sample-modal" onclick="closeSampleModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <span class="modal-title" data-i18n="sampleCode">Sample Code</span>
+                <button class="modal-close" onclick="closeSampleModal()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-tabs">
+                <button class="modal-tab active" data-tab="mermaid" onclick="switchSampleTab('mermaid')">
+                    <span data-i18n="mermaidDiagrams">Mermaid Diagrams</span>
+                </button>
+                <button class="modal-tab" data-tab="math" onclick="switchSampleTab('math')">
+                    <span data-i18n="mathFormulas">Math Formulas</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="tab-content active" id="tab-mermaid">
+                    <div class="sample-grid" id="mermaid-samples"></div>
+                </div>
+                <div class="tab-content" id="tab-math">
+                    <div class="sample-grid" id="math-samples"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
