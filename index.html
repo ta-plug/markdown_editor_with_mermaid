@@ -3472,6 +3472,9 @@ timeline
         }
 
         function insertSample(code) {
+            // Save state before change for undo
+            saveState();
+
             const start = editor.selectionStart;
             const end = editor.selectionEnd;
             const value = editor.value;
@@ -3487,6 +3490,9 @@ timeline
 
             editor.value = value.substring(0, start) + insertion + value.substring(end);
             editor.selectionStart = editor.selectionEnd = start + insertion.length;
+
+            // Save state after change for undo
+            saveState();
 
             isDirty = true;
             updatePreview();
