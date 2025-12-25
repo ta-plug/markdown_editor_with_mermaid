@@ -12,7 +12,9 @@ A feature-rich, browser-based Markdown editor with real-time preview, Mermaid di
   - Inline math: `$E=mc^2$`
   - Block math: `$$\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}$$`
   - Export equations as PNG or SVG
-- **Syntax Highlighting**: Code blocks with automatic language detection
+- **Syntax Highlighting**:
+  - Editor: Markdown syntax highlighting with CodeMirror (GFM mode)
+  - Preview: Code blocks with automatic language detection (Highlight.js)
 - **File Operations**: Open, save, and create Markdown files
 - **Theme Support**: 
   - Light/Dark mode toggle
@@ -108,8 +110,9 @@ If you plan to use this editor with untrusted content, consider adding [DOMPurif
 
 ## 🛠️ Technologies Used
 
+- [CodeMirror 5](https://codemirror.net/5/) - Editor with syntax highlighting
 - [Marked.js](https://marked.js.org/) - Markdown parser
-- [Highlight.js](https://highlightjs.org/) - Syntax highlighting
+- [Highlight.js](https://highlightjs.org/) - Preview syntax highlighting
 - [Mermaid.js](https://mermaid.js.org/) - Diagram generation
 - [KaTeX](https://katex.org/) - Math equation rendering
 - [html2canvas](https://html2canvas.hertzen.com/) - PNG export functionality
@@ -132,6 +135,13 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 5. Open a Pull Request
 
 ## 📝 Changelog
+
+### v2.0.0
+- **Editor Syntax Highlighting**: Integrated CodeMirror 5 for real-time Markdown syntax highlighting
+  - GFM (GitHub Flavored Markdown) mode
+  - Line numbers
+  - Theme sync with Light/Dark mode (default/material-darker)
+  - Improved code block visibility in dark mode
 
 ### v1.3.2
 - Fix: Mermaid diagrams now print at correct size (no more abnormal scaling)

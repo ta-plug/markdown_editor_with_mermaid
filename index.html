@@ -10,6 +10,18 @@
     <!-- Highlight.js for code syntax highlighting -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css" id="hljs-theme">
     <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/highlight.min.js"></script>
+    <!-- CodeMirror 5 for editor syntax highlighting -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/theme/material-darker.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/theme/default.css">
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/markdown/markdown.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/xml/xml.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/css/css.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/python/python.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/gfm/gfm.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/addon/mode/overlay.min.js"></script>
     <!-- Mermaid.js for diagrams -->
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <!-- html2canvas for PNG export -->
@@ -361,6 +373,124 @@
             opacity: 1;
         }
 
+        #editor-wrapper {
+            flex: 1;
+            overflow: hidden;
+            background: var(--editor-bg);
+        }
+
+        #editor-wrapper .CodeMirror {
+            height: 100%;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            line-height: 1.7;
+            background: var(--editor-bg);
+            color: var(--text-primary);
+        }
+
+        #editor-wrapper .CodeMirror-gutters {
+            background: var(--bg-tertiary);
+            border-right: 1px solid var(--border);
+        }
+
+        #editor-wrapper .CodeMirror-linenumber {
+            color: var(--text-muted);
+            padding: 0 8px;
+        }
+
+        #editor-wrapper .CodeMirror-cursor {
+            border-left-color: var(--accent);
+        }
+
+        #editor-wrapper .CodeMirror-selected {
+            background: var(--accent-light) !important;
+        }
+
+        #editor-wrapper .CodeMirror-focused .CodeMirror-selected {
+            background: var(--accent-light) !important;
+        }
+
+        /* CodeMirror Markdown syntax colors */
+        .cm-header { color: var(--accent); font-weight: bold; }
+        .cm-header-1 { font-size: 1.4em; }
+        .cm-header-2 { font-size: 1.2em; }
+        .cm-header-3 { font-size: 1.1em; }
+        .cm-strong { font-weight: bold; color: var(--text-primary); }
+        .cm-em { font-style: italic; color: var(--text-secondary); }
+        .cm-link { color: #58a6ff; }
+        .cm-url { color: var(--text-muted); }
+        .cm-comment { color: var(--text-muted); }
+        .cm-quote { color: var(--text-secondary); font-style: italic; }
+        .cm-code, .cm-inline-code {
+            background: var(--code-bg);
+            color: #e06c75;
+            border-radius: 3px;
+            padding: 1px 4px;
+        }
+        .cm-keyword { color: #c678dd; }
+        .cm-def { color: #61afef; }
+        .cm-variable { color: var(--text-primary); }
+        .cm-variable-2 { color: #e5c07b; }
+        .cm-string { color: #98c379; }
+        .cm-number { color: #d19a66; }
+        .cm-atom { color: #d19a66; }
+        .cm-property { color: #61afef; }
+        .cm-operator { color: #56b6c2; }
+
+        /* Dark mode specific overrides for CodeMirror */
+        [data-theme="dark"] .cm-code,
+        [data-theme="dark"] .cm-inline-code {
+            background: var(--code-bg);
+            color: #e06c75;
+        }
+
+        /* Dark mode: Better visibility for code block content */
+        [data-theme="dark"] .cm-s-material-darker .cm-comment {
+            color: #a0a8b7;
+        }
+        [data-theme="dark"] .cm-s-material-darker .cm-string {
+            color: #98c379;
+        }
+        [data-theme="dark"] .cm-s-material-darker .cm-keyword {
+            color: #c678dd;
+        }
+        [data-theme="dark"] .cm-s-material-darker .cm-variable,
+        [data-theme="dark"] .cm-s-material-darker .cm-variable-2 {
+            color: #e5c07b;
+        }
+        [data-theme="dark"] .cm-s-material-darker .cm-def {
+            color: #61afef;
+        }
+        [data-theme="dark"] .cm-s-material-darker .cm-property {
+            color: #61afef;
+        }
+        [data-theme="dark"] .cm-s-material-darker .cm-atom {
+            color: #d19a66;
+        }
+        [data-theme="dark"] .cm-s-material-darker .cm-number {
+            color: #d19a66;
+        }
+        [data-theme="dark"] .cm-s-material-darker .cm-operator {
+            color: #56b6c2;
+        }
+        [data-theme="dark"] .cm-s-material-darker .cm-meta {
+            color: #c8ccd4;
+        }
+        [data-theme="dark"] .cm-s-material-darker .cm-tag {
+            color: #e06c75;
+        }
+        [data-theme="dark"] .cm-s-material-darker .cm-attribute {
+            color: #d19a66;
+        }
+
+        /* Dark mode: Mermaid/code block text - brighter for readability */
+        [data-theme="dark"] .CodeMirror-code .cm-comment {
+            color: #b8bfc9 !important;
+        }
+        [data-theme="dark"] .CodeMirror pre.CodeMirror-line {
+            color: #d0d4dc;
+        }
+
         #editor {
             flex: 1;
             padding: 20px;
@@ -374,6 +504,7 @@
             resize: none;
             tab-size: 4;
             caret-color: var(--accent);
+            display: none; /* Hidden when CodeMirror is active */
         }
 
         #editor::placeholder {
@@ -1811,7 +1942,9 @@
                 </svg>
                 <span data-i18n="editor">Editor</span>
             </div>
-            <textarea id="editor" data-i18n-placeholder="editorPlaceholder" placeholder="Enter Markdown here..."></textarea>
+            <div id="editor-wrapper">
+                <textarea id="editor" data-i18n-placeholder="editorPlaceholder" placeholder="Enter Markdown here..."></textarea>
+            </div>
         </div>
         
         <div class="resizer" id="resizer"></div>
@@ -2496,7 +2629,8 @@ pie title 项目进度
         let debounceTimer = null;
 
         // DOM Elements
-        const editor = document.getElementById('editor');
+        const editorTextarea = document.getElementById('editor');
+        const editorWrapper = document.getElementById('editor-wrapper');
         const preview = document.getElementById('preview');
         const fileInput = document.getElementById('file-input');
         const fileNameDisplay = document.getElementById('file-name-display');
@@ -2506,28 +2640,134 @@ pie title 项目进度
         const resizer = document.getElementById('resizer');
         const editorPanel = document.getElementById('editor-panel');
 
+        // CodeMirror instance
+        let cmEditor = null;
+
+        // Editor proxy object for backward compatibility
+        const editor = {
+            get value() {
+                return cmEditor ? cmEditor.getValue() : editorTextarea.value;
+            },
+            set value(val) {
+                if (cmEditor) {
+                    cmEditor.setValue(val);
+                } else {
+                    editorTextarea.value = val;
+                }
+            },
+            get selectionStart() {
+                if (cmEditor) {
+                    const cursor = cmEditor.getCursor('start');
+                    return cmEditor.indexFromPos(cursor);
+                }
+                return editorTextarea.selectionStart;
+            },
+            set selectionStart(val) {
+                if (cmEditor) {
+                    const pos = cmEditor.posFromIndex(val);
+                    cmEditor.setCursor(pos);
+                } else {
+                    editorTextarea.selectionStart = val;
+                }
+            },
+            get selectionEnd() {
+                if (cmEditor) {
+                    const cursor = cmEditor.getCursor('end');
+                    return cmEditor.indexFromPos(cursor);
+                }
+                return editorTextarea.selectionEnd;
+            },
+            set selectionEnd(val) {
+                // For CodeMirror, we typically set selection using setSelection
+            },
+            setSelectionRange(start, end) {
+                if (cmEditor) {
+                    const startPos = cmEditor.posFromIndex(start);
+                    const endPos = cmEditor.posFromIndex(end);
+                    cmEditor.setSelection(startPos, endPos);
+                    cmEditor.focus();
+                } else {
+                    editorTextarea.setSelectionRange(start, end);
+                }
+            },
+            focus() {
+                if (cmEditor) {
+                    cmEditor.focus();
+                } else {
+                    editorTextarea.focus();
+                }
+            },
+            blur() {
+                if (cmEditor) {
+                    cmEditor.getInputField().blur();
+                } else {
+                    editorTextarea.blur();
+                }
+            }
+        };
+
+        // Initialize CodeMirror
+        function initCodeMirror() {
+            const isDark = document.body.getAttribute('data-theme') === 'dark';
+
+            cmEditor = CodeMirror.fromTextArea(editorTextarea, {
+                mode: 'gfm', // GitHub Flavored Markdown
+                theme: isDark ? 'material-darker' : 'default',
+                lineNumbers: true,
+                lineWrapping: true,
+                indentUnit: parseInt(localStorage.getItem('indentSize')) || 4,
+                tabSize: parseInt(localStorage.getItem('indentSize')) || 4,
+                indentWithTabs: false,
+                autoCloseBrackets: true,
+                matchBrackets: true,
+                styleActiveLine: true,
+                placeholder: t('editorPlaceholder')
+            });
+
+            // Set initial content
+            cmEditor.setValue(t('sampleMarkdown'));
+
+            // Handle input events for preview update
+            cmEditor.on('change', () => {
+                schedulePreviewUpdate();
+                updateStats();
+            });
+
+            // Apply saved font settings
+            const savedFontFamily = localStorage.getItem('editorFontFamily');
+            const savedFontSize = localStorage.getItem('editorFontSize');
+            if (savedFontFamily) {
+                cmEditor.getWrapperElement().style.fontFamily = savedFontFamily;
+            }
+            if (savedFontSize) {
+                cmEditor.getWrapperElement().style.fontSize = savedFontSize + 'px';
+            }
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             // Load saved language preference (default: English)
             const savedLang = localStorage.getItem('language') || 'en';
             currentLang = savedLang;
             updateUILanguage();
-            
-            editor.value = t('sampleMarkdown');
-            updatePreview();
-            updateStats();
-            initResizer();
-            
-            // Check for saved theme preference
+
+            // Check for saved theme preference BEFORE CodeMirror init
             const savedTheme = localStorage.getItem('theme');
             if (savedTheme === 'dark') {
                 document.body.setAttribute('data-theme', 'dark');
                 updateThemeIcon();
             }
-            
+
             // Check for saved color theme
             const savedColor = localStorage.getItem('colorTheme') || 'indigo';
             setColorTheme(savedColor, false);
+
+            // Initialize CodeMirror (after theme is set)
+            initCodeMirror();
+
+            updatePreview();
+            updateStats();
+            initResizer();
 
             // Initialize indent size from localStorage
             initIndentSize();
@@ -2729,145 +2969,11 @@ pie title 项目进度
             }
         }
 
-        // Editor input handler
-        editor.addEventListener('input', () => {
-            isDirty = true;
-            saveStateDebounced();
-            schedulePreviewUpdate();
-            updateStats();
-        });
+        // Editor input handler - for non-CodeMirror fallback only
+        // (CodeMirror handles its own events via cmEditor.on('change', ...))
 
-        // Tab key, Enter key, and Undo/Redo keyboard shortcuts
-        editor.addEventListener('keydown', (e) => {
-            const start = editor.selectionStart;
-            const end = editor.selectionEnd;
-            const value = editor.value;
-
-            // Ctrl+Z - Undo
-            if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
-                e.preventDefault();
-                performUndo();
-                return;
-            }
-
-            // Ctrl+Y or Ctrl+Shift+Z - Redo
-            if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey) || (e.key === 'Z' && e.shiftKey))) {
-                e.preventDefault();
-                performRedo();
-                return;
-            }
-
-            // Enter key - preserve current line's indent
-            if (e.key === 'Enter') {
-                e.preventDefault();
-
-                // Find the start of the current line
-                const lineStart = value.lastIndexOf('\n', start - 1) + 1;
-                const lineContent = value.substring(lineStart, start);
-
-                // Extract leading whitespace (spaces and tabs)
-                const indentMatch = lineContent.match(/^[\t ]*/);
-                const indent = indentMatch ? indentMatch[0] : '';
-
-                // Insert newline with the same indent
-                const insertion = '\n' + indent;
-                saveState(); // Save state before change
-                editor.value = value.substring(0, start) + insertion + value.substring(end);
-                editor.selectionStart = editor.selectionEnd = start + insertion.length;
-
-                // Scroll cursor into view
-                scrollCursorIntoView();
-
-                schedulePreviewUpdate();
-                return;
-            }
-
-            // Tab key handling
-            if (e.key === 'Tab') {
-                e.preventDefault();
-                saveState(); // Save state before change
-
-                // Check if there's a selection spanning multiple lines
-                const selectedText = value.substring(start, end);
-                const hasMultipleLines = selectedText.includes('\n') || start !== end;
-
-                if (hasMultipleLines && start !== end) {
-                    // Multi-line selection: indent/outdent all selected lines
-                    const lineStart = value.lastIndexOf('\n', start - 1) + 1;
-                    const lineEnd = value.indexOf('\n', end);
-                    const actualLineEnd = lineEnd === -1 ? value.length : lineEnd;
-
-                    const selectedLines = value.substring(lineStart, actualLineEnd);
-                    const lines = selectedLines.split('\n');
-
-                    let newLines;
-                    let cursorAdjustment;
-
-                    const indentStr = ' '.repeat(indentSize);
-
-                    if (e.shiftKey) {
-                        // Shift+Tab: remove indent (up to indentSize spaces or 1 tab)
-                        newLines = lines.map(line => {
-                            if (line.startsWith('\t')) {
-                                return line.substring(1);
-                            } else if (line.startsWith(indentStr)) {
-                                return line.substring(indentSize);
-                            } else {
-                                // Remove as many leading spaces as possible (up to indentSize)
-                                const match = line.match(new RegExp(`^( {1,${indentSize}})`));
-                                return match ? line.substring(match[1].length) : line;
-                            }
-                        });
-                        // Calculate cursor adjustment for first line
-                        const firstLineChange = lines[0].length - newLines[0].length;
-                        cursorAdjustment = -firstLineChange;
-                    } else {
-                        // Tab: add indent (indentSize spaces)
-                        newLines = lines.map(line => indentStr + line);
-                        cursorAdjustment = indentSize;
-                    }
-
-                    const newText = newLines.join('\n');
-                    editor.value = value.substring(0, lineStart) + newText + value.substring(actualLineEnd);
-
-                    // Adjust selection to cover the modified lines
-                    const newStart = Math.max(lineStart, start + cursorAdjustment);
-                    const lengthDiff = newText.length - selectedLines.length;
-                    editor.selectionStart = newStart;
-                    editor.selectionEnd = actualLineEnd + lengthDiff;
-                } else {
-                    // Single cursor or single line
-                    const indentStr = ' '.repeat(indentSize);
-
-                    if (e.shiftKey) {
-                        // Shift+Tab: remove indent from current line
-                        const lineStart = value.lastIndexOf('\n', start - 1) + 1;
-                        const lineContent = value.substring(lineStart);
-
-                        let removeCount = 0;
-                        if (lineContent.startsWith('\t')) {
-                            removeCount = 1;
-                        } else if (lineContent.startsWith(indentStr)) {
-                            removeCount = indentSize;
-                        } else {
-                            const match = lineContent.match(new RegExp(`^( {1,${indentSize}})`));
-                            removeCount = match ? match[1].length : 0;
-                        }
-
-                        if (removeCount > 0) {
-                            editor.value = value.substring(0, lineStart) + value.substring(lineStart + removeCount);
-                            editor.selectionStart = editor.selectionEnd = Math.max(lineStart, start - removeCount);
-                        }
-                    } else {
-                        // Tab: insert indentSize spaces at cursor
-                        editor.value = value.substring(0, start) + indentStr + value.substring(end);
-                        editor.selectionStart = editor.selectionEnd = start + indentSize;
-                    }
-                }
-                schedulePreviewUpdate();
-                return;
-            }
-
+        // Global keyboard shortcuts (work with or without CodeMirror)
+        document.addEventListener('keydown', (e) => {
             // Keyboard shortcuts
             if (e.ctrlKey || e.metaKey) {
                 if (e.key === 's') {
@@ -3319,18 +3425,26 @@ pie title 项目进度
             localStorage.setItem('theme', isDark ? 'light' : 'dark');
             updateThemeIcon();
             updateMermaidTheme();
+            updateCodeMirrorTheme();
         }
 
         function updateThemeIcon() {
             const isDark = document.body.getAttribute('data-theme') === 'dark';
             document.getElementById('theme-icon-light').style.display = isDark ? 'none' : 'block';
             document.getElementById('theme-icon-dark').style.display = isDark ? 'block' : 'none';
-            
+
             // Update highlight.js theme
             const hljsTheme = document.getElementById('hljs-theme');
-            hljsTheme.href = isDark 
+            hljsTheme.href = isDark
                 ? 'https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css'
                 : 'https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css';
+        }
+
+        function updateCodeMirrorTheme() {
+            if (cmEditor) {
+                const isDark = document.body.getAttribute('data-theme') === 'dark';
+                cmEditor.setOption('theme', isDark ? 'material-darker' : 'default');
+            }
         }
 
         // Color theme
@@ -3424,13 +3538,22 @@ pie title 项目进度
         function setEditorFontFamily(family) {
             editorFontFamily = family;
             localStorage.setItem('editorFontFamily', family);
-            editor.style.fontFamily = family;
+            if (cmEditor) {
+                cmEditor.getWrapperElement().style.fontFamily = family;
+            } else {
+                editorTextarea.style.fontFamily = family;
+            }
         }
 
         function adjustEditorFontSize(delta) {
             editorFontSize = Math.max(10, Math.min(24, editorFontSize + delta));
             localStorage.setItem('editorFontSize', editorFontSize);
-            editor.style.fontSize = editorFontSize + 'px';
+            if (cmEditor) {
+                cmEditor.getWrapperElement().style.fontSize = editorFontSize + 'px';
+                cmEditor.refresh();
+            } else {
+                editorTextarea.style.fontSize = editorFontSize + 'px';
+            }
             document.getElementById('editor-font-size-display').textContent = editorFontSize + 'px';
         }
 
@@ -3448,9 +3571,14 @@ pie title 项目进度
         }
 
         function initFontSettings() {
-            // Apply saved settings
-            editor.style.fontFamily = editorFontFamily;
-            editor.style.fontSize = editorFontSize + 'px';
+            // Apply saved settings to CodeMirror or textarea
+            if (cmEditor) {
+                cmEditor.getWrapperElement().style.fontFamily = editorFontFamily;
+                cmEditor.getWrapperElement().style.fontSize = editorFontSize + 'px';
+            } else {
+                editorTextarea.style.fontFamily = editorFontFamily;
+                editorTextarea.style.fontSize = editorFontSize + 'px';
+            }
             preview.style.fontFamily = previewFontFamily;
             preview.style.fontSize = previewFontSize + 'px';
 
@@ -3488,6 +3616,12 @@ pie title 项目进度
             indentSize = size;
             localStorage.setItem('indentSize', size);
             document.getElementById('current-indent-size').textContent = size;
+
+            // Update CodeMirror indent settings
+            if (cmEditor) {
+                cmEditor.setOption('indentUnit', size);
+                cmEditor.setOption('tabSize', size);
+            }
 
             // Update active state
             document.querySelectorAll('.indent-option').forEach(opt => {
