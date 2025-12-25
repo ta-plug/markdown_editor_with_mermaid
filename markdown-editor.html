@@ -2583,7 +2583,27 @@ pie title 项目进度
         // Update preview
         let mathBlockCounter = 0;
 
+        // Cache for Mermaid diagrams - key is the code hash, value is SVG
+        const mermaidCache = new Map(); // code -> svg
+
+        // Simple hash function for caching
+        function hashCode(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash; // Convert to 32bit integer
+            }
+            return hash.toString();
+        }
+
         async function updatePreview() {
+            // Save scroll position before update
+            const scrollTop = preview.scrollTop;
+            const scrollHeight = preview.scrollHeight;
+            const clientHeight = preview.clientHeight;
+            const wasAtBottom = scrollTop + clientHeight >= scrollHeight - 10;
+
             let content = editor.value;
             mermaidCounter = 0;
             mathBlockCounter = 0;
@@ -2650,9 +2670,10 @@ pie title 项目进度
                 content = content.replace(`%%CODEBLOCK_${index}%%`, code);
             });
 
-            // Process mermaid code blocks
+            // Process mermaid code blocks - extract and track for caching
             const mermaidRegex = /```mermaid\n([\s\S]*?)```/g;
             const mermaidBlocks = [];
+            const mermaidCodeToRender = []; // { id, code, hash }
             let match;
 
             while ((match = mermaidRegex.exec(content)) !== null) {
@@ -2662,6 +2683,39 @@ pie title 项目进度
             // Replace mermaid blocks with placeholders
             content = content.replace(mermaidRegex, (match, code) => {
                 const id = `mermaid-${mermaidCounter++}`;
+                const trimmedCode = code.trim();
+                const codeHash = hashCode(trimmedCode);
+
+                // Check if we have a cached version (by code content, not by id)
+                const cachedSvg = mermaidCache.get(codeHash);
+                if (cachedSvg) {
+                    // Use cached SVG
+                    return `<div class="mermaid-container" data-mermaid-id="${id}">
+                        <div class="mermaid-actions">
+                            <button class="mermaid-action-btn" onclick="downloadMermaidPNG('${id}')">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                                    <polyline points="21,15 16,10 5,21"/>
+                                </svg>
+                                PNG
+                            </button>
+                            <button class="mermaid-action-btn" onclick="downloadMermaidSVG('${id}')">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="12,2 2,7 12,12 22,7 12,2"/>
+                                    <polyline points="2,17 12,22 22,17"/>
+                                    <polyline points="2,12 12,17 22,12"/>
+                                </svg>
+                                SVG
+                            </button>
+                        </div>
+                        <div class="mermaid-cached" id="${id}">${cachedSvg}</div>
+                    </div>`;
+                }
+
+                // Not cached, need to render
+                mermaidCodeToRender.push({ id, code: trimmedCode, hash: codeHash });
+
                 return `<div class="mermaid-container" data-mermaid-id="${id}">
                     <div class="mermaid-actions">
                         <button class="mermaid-action-btn" onclick="downloadMermaidPNG('${id}')">
@@ -2681,20 +2735,31 @@ pie title 项目进度
                             SVG
                         </button>
                     </div>
-                    <div class="mermaid" id="${id}">${code.trim()}</div>
+                    <div class="mermaid" id="${id}" data-hash="${codeHash}">${trimmedCode}</div>
                 </div>`;
             });
 
             // Parse markdown
             preview.innerHTML = marked.parse(content);
 
-            // Render mermaid diagrams
-            try {
-                await mermaid.run({
-                    querySelector: '.mermaid'
-                });
-            } catch (error) {
-                console.error('Mermaid rendering error:', error);
+            // Only render mermaid diagrams that are not cached
+            const uncachedMermaids = preview.querySelectorAll('.mermaid:not(.mermaid-cached)');
+            if (uncachedMermaids.length > 0) {
+                try {
+                    await mermaid.run({
+                        nodes: uncachedMermaids
+                    });
+
+                    // Cache the rendered SVGs by code hash
+                    uncachedMermaids.forEach(el => {
+                        const hash = el.getAttribute('data-hash');
+                        if (hash && el.innerHTML.includes('<svg')) {
+                            mermaidCache.set(hash, el.innerHTML);
+                        }
+                    });
+                } catch (error) {
+                    console.error('Mermaid rendering error:', error);
+                }
             }
 
             // Render math with KaTeX
@@ -2709,6 +2774,15 @@ pie title 项目进度
                 });
             } catch (error) {
                 console.error('KaTeX rendering error:', error);
+            }
+
+            // Restore scroll position
+            if (wasAtBottom) {
+                // If user was at the bottom, stay at the bottom
+                preview.scrollTop = preview.scrollHeight;
+            } else {
+                // Otherwise restore the previous position
+                preview.scrollTop = scrollTop;
             }
 
             // Update counts
@@ -2821,6 +2895,8 @@ pie title 项目进度
                 theme: isDark ? 'dark' : 'default',
                 securityLevel: 'loose'
             });
+            // Clear mermaid cache when theme changes (SVGs have different colors)
+            mermaidCache.clear();
             updatePreview();
         }
 
