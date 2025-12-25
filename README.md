@@ -22,7 +22,9 @@ A feature-rich, browser-based Markdown editor with real-time preview, Mermaid di
 - **Keyboard Shortcuts**:
   - `Ctrl/Cmd + S`: Save file
   - `Ctrl/Cmd + O`: Open file
-  - `Tab`: Insert 4 spaces
+  - `Tab`: Insert spaces (configurable: 2/4/8)
+  - `Shift+Tab`: Remove indent
+  - `Enter`: Auto-indent (preserves current line's indentation)
 
 ## 🚀 Getting Started
 
@@ -125,6 +127,11 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 5. Open a Pull Request
 
 ## 📝 Changelog
+
+### v1.1.1
+- Smart indent: Auto-preserve indentation on Enter
+- Tab/Shift+Tab indent/outdent for single and multiple lines
+- Configurable indent size (2/4/8 spaces) with persistent setting
 
 ### v1.1.0
 - Math equation support with KaTeX (inline and block)
