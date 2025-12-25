@@ -2455,6 +2455,21 @@ pie title 项目进度
             updateUndoRedoButtons();
         }
 
+        // Scroll textarea to keep cursor visible
+        function scrollCursorIntoView() {
+            const cursorPos = editor.selectionStart;
+
+            // Force browser to recalculate and show cursor by refocusing
+            requestAnimationFrame(() => {
+                // Blur and refocus to force cursor redraw
+                editor.blur();
+                editor.focus();
+
+                // Restore cursor position and trigger native scroll behavior
+                editor.setSelectionRange(cursorPos, cursorPos);
+            });
+        }
+
         // Preview update scheduling with requestIdleCallback + requestAnimationFrame
         let previewUpdatePending = false;
         let previewIdleCallbackId = null;
@@ -2532,6 +2547,10 @@ pie title 项目进度
                 saveState(); // Save state before change
                 editor.value = value.substring(0, start) + insertion + value.substring(end);
                 editor.selectionStart = editor.selectionEnd = start + insertion.length;
+
+                // Scroll cursor into view
+                scrollCursorIntoView();
+
                 schedulePreviewUpdate();
                 return;
             }

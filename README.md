@@ -133,6 +133,9 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📝 Changelog
 
+### v1.2.5
+- Fix: Cursor now stays visible after pressing Enter at end of document
+
 ### v1.2.4
 - Performance: requestIdleCallback for non-blocking preview updates
 - Performance: Intersection Observer for lazy rendering (offscreen diagrams/equations render on scroll)
