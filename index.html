@@ -437,6 +437,41 @@
         .cm-property { color: #61afef; }
         .cm-operator { color: #56b6c2; }
 
+        /* Math highlighting */
+        .cm-math-inline {
+            color: #c678dd;
+            background: rgba(198, 120, 221, 0.12);
+            border-radius: 3px;
+            padding: 0 2px;
+        }
+        .cm-math-delimiter {
+            color: #c678dd;
+            font-weight: bold;
+        }
+        .cm-math-block {
+            color: #c678dd;
+            background: rgba(198, 120, 221, 0.08);
+        }
+        [data-theme="dark"] .cm-math-inline {
+            color: #d19a66;
+            background: rgba(209, 154, 102, 0.18);
+        }
+        [data-theme="dark"] .cm-math-delimiter {
+            color: #d19a66;
+        }
+        [data-theme="dark"] .cm-math-block {
+            color: #d19a66;
+            background: rgba(209, 154, 102, 0.12);
+        }
+
+        /* Mermaid code block highlighting - green color */
+        .cm-mermaid-code {
+            color: #50a14f;
+        }
+        [data-theme="dark"] .cm-mermaid-code {
+            color: #98c379;
+        }
+
         /* Dark mode specific overrides for CodeMirror */
         [data-theme="dark"] .cm-code,
         [data-theme="dark"] .cm-inline-code {
@@ -2706,12 +2741,135 @@ pie title 项目进度
             }
         };
 
+        // Pre-analyzed line information for block math and mermaid
+        let blockMathLines = new Set(); // Lines that are inside $$ blocks (not including delimiter lines)
+        let mermaidLines = new Set();   // Lines that are inside ```mermaid blocks
+
+        // Analyze full text to find block math and mermaid regions
+        function analyzeBlockRegions(text) {
+            const lines = text.split('\n');
+            const newBlockMathLines = new Set();
+            const newMermaidLines = new Set();
+
+            let inBlockMath = false;
+            let blockMathStart = -1;
+            let inMermaid = false;
+            let inCodeBlock = false;
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+
+                // Check for code block start/end
+                if (line.startsWith('```')) {
+                    if (!inCodeBlock) {
+                        inCodeBlock = true;
+                        if (line.match(/^```mermaid/i)) {
+                            inMermaid = true;
+                        }
+                    } else {
+                        inCodeBlock = false;
+                        inMermaid = false;
+                    }
+                    continue;
+                }
+
+                // Mark mermaid lines (content lines, not the ``` markers)
+                if (inMermaid) {
+                    newMermaidLines.add(i);
+                }
+
+                // Skip math detection inside code blocks
+                if (inCodeBlock) continue;
+
+                // Check for $$ delimiter
+                if (line === '$$') {
+                    if (!inBlockMath) {
+                        inBlockMath = true;
+                        blockMathStart = i;
+                    } else {
+                        // End of block math - mark all lines between start and end
+                        for (let j = blockMathStart + 1; j < i; j++) {
+                            newBlockMathLines.add(j);
+                        }
+                        inBlockMath = false;
+                        blockMathStart = -1;
+                    }
+                }
+            }
+
+            blockMathLines = newBlockMathLines;
+            mermaidLines = newMermaidLines;
+        }
+
+        // Define math/mermaid overlay with pre-analyzed line info
+        CodeMirror.defineMode('gfm-math', function(config) {
+            const gfmMode = CodeMirror.getMode(config, 'gfm');
+
+            const mathOverlay = {
+                token: function(stream, state) {
+                    const lineNo = stream.lineOracle ? stream.lineOracle.line : -1;
+
+                    // If this line is inside a block math region, highlight everything
+                    if (blockMathLines.has(lineNo)) {
+                        stream.skipToEnd();
+                        return 'math-block';
+                    }
+
+                    // If this line is inside a mermaid block, highlight everything
+                    if (mermaidLines.has(lineNo)) {
+                        stream.skipToEnd();
+                        return 'mermaid-code';
+                    }
+
+                    // Match $$ - check if it's inline block math ($$...$$) on same line
+                    if (stream.match(/^\$\$/)) {
+                        // Look ahead for closing $$ on same line
+                        const rest = stream.string.slice(stream.pos);
+                        const closingMatch = rest.indexOf('$$');
+                        if (closingMatch >= 0) {
+                            // Found closing $$ - consume content and closing delimiter
+                            for (let i = 0; i < closingMatch + 2; i++) {
+                                stream.next();
+                            }
+                            return 'math-block';
+                        }
+                        // No closing $$ on same line - just mark as delimiter
+                        return 'math-delimiter';
+                    }
+
+                    // Match inline math $...$ (single line only, not $$)
+                    if (stream.match(/^\$(?!\$)/)) {
+                        // Look for closing $ on same line
+                        let ch;
+                        while ((ch = stream.next()) != null) {
+                            if (ch === '$' && stream.peek() !== '$') {
+                                return 'math-inline';
+                            }
+                            if (ch === '\\' && stream.peek()) {
+                                stream.next(); // skip escaped char
+                            }
+                        }
+                        // No closing $ found, return null (no highlight)
+                        return null;
+                    }
+
+                    // Skip to next potential marker
+                    while (stream.next() != null) {
+                        if (stream.peek() === '$') break;
+                    }
+                    return null;
+                }
+            };
+
+            return CodeMirror.overlayMode(gfmMode, mathOverlay);
+        });
+
         // Initialize CodeMirror
         function initCodeMirror() {
             const isDark = document.body.getAttribute('data-theme') === 'dark';
 
             cmEditor = CodeMirror.fromTextArea(editorTextarea, {
-                mode: 'gfm', // GitHub Flavored Markdown
+                mode: 'gfm-math', // GFM with math highlighting
                 theme: isDark ? 'material-darker' : 'default',
                 lineNumbers: true,
                 lineWrapping: true,
@@ -2727,8 +2885,32 @@ pie title 项目进度
             // Set initial content
             cmEditor.setValue(t('sampleMarkdown'));
 
+            // Initial analysis for block highlighting
+            analyzeBlockRegions(cmEditor.getValue());
+
             // Handle input events for preview update
+            let refreshPending = false;
             cmEditor.on('change', () => {
+                // Analyze block regions for highlighting
+                const oldMathLines = new Set(blockMathLines);
+                const oldMermaidLines = new Set(mermaidLines);
+                analyzeBlockRegions(cmEditor.getValue());
+
+                // Check if block regions changed - if so, refresh highlighting
+                const mathChanged = blockMathLines.size !== oldMathLines.size ||
+                    [...blockMathLines].some(l => !oldMathLines.has(l));
+                const mermaidChanged = mermaidLines.size !== oldMermaidLines.size ||
+                    [...mermaidLines].some(l => !oldMermaidLines.has(l));
+
+                if ((mathChanged || mermaidChanged) && !refreshPending) {
+                    refreshPending = true;
+                    requestAnimationFrame(() => {
+                        // Force re-tokenization by setting the mode again
+                        cmEditor.setOption('mode', cmEditor.getOption('mode'));
+                        refreshPending = false;
+                    });
+                }
+
                 schedulePreviewUpdate();
                 updateStats();
             });

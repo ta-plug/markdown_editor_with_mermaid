@@ -136,6 +136,12 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📝 Changelog
 
+### v2.0.1
+- **Math Equation Highlighting**: Block math (`$$...$$`) content now highlighted in editor
+  - Single-line block math (`$$formula$$`) supported
+  - Multi-line block math fully highlighted
+- **Mermaid Code Highlighting**: Mermaid diagram code blocks now displayed in green for better visibility
+
 ### v2.0.0
 - **Editor Syntax Highlighting**: Integrated CodeMirror 5 for real-time Markdown syntax highlighting
   - GFM (GitHub Flavored Markdown) mode
