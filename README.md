@@ -136,6 +136,10 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📝 Changelog
 
+### v2.0.3
+- Fix: Shift+Tab now works for outdenting selected lines
+- Fix: Indent size setting now defaults to 2 (was incorrectly fixed at 4)
+
 ### v2.0.2
 - Fix: Math equation SVG export now captures full content (including right-hand side of equations)
 

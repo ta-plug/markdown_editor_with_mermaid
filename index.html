@@ -2868,18 +2868,32 @@ pie title 项目进度
         function initCodeMirror() {
             const isDark = document.body.getAttribute('data-theme') === 'dark';
 
+            const savedIndentSize = parseInt(localStorage.getItem('indentSize')) || 2;
+
             cmEditor = CodeMirror.fromTextArea(editorTextarea, {
                 mode: 'gfm-math', // GFM with math highlighting
                 theme: isDark ? 'material-darker' : 'default',
                 lineNumbers: true,
                 lineWrapping: true,
-                indentUnit: parseInt(localStorage.getItem('indentSize')) || 4,
-                tabSize: parseInt(localStorage.getItem('indentSize')) || 4,
+                indentUnit: savedIndentSize,
+                tabSize: savedIndentSize,
                 indentWithTabs: false,
                 autoCloseBrackets: true,
                 matchBrackets: true,
                 styleActiveLine: true,
-                placeholder: t('editorPlaceholder')
+                placeholder: t('editorPlaceholder'),
+                extraKeys: {
+                    'Tab': (cm) => {
+                        if (cm.somethingSelected()) {
+                            cm.indentSelection('add');
+                        } else {
+                            cm.replaceSelection(' '.repeat(cm.getOption('indentUnit')), 'end');
+                        }
+                    },
+                    'Shift-Tab': (cm) => {
+                        cm.indentSelection('subtract');
+                    }
+                }
             });
 
             // Set initial content
