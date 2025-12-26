@@ -2049,6 +2049,7 @@
                 sampleCode: "Sample Code",
                 mermaidDiagrams: "Mermaid Diagrams",
                 mathFormulas: "Math Formulas",
+                markdownItems: "Markdown Items",
                 sampleInserted: "Sample inserted",
                 undo: "Undo",
                 redo: "Redo",
@@ -2233,6 +2234,7 @@ Enjoy! 🚀
                 sampleCode: "サンプルコード",
                 mermaidDiagrams: "Mermaid図",
                 mathFormulas: "数式",
+                markdownItems: "Markdown要素",
                 sampleInserted: "サンプルを挿入しました",
                 undo: "元に戻す",
                 redo: "やり直す",
@@ -2417,6 +2419,7 @@ pie title プロジェクトの進捗
                 sampleCode: "示例代码",
                 mermaidDiagrams: "Mermaid 图表",
                 mathFormulas: "数学公式",
+                markdownItems: "Markdown 元素",
                 sampleInserted: "已插入示例",
                 undo: "撤销",
                 redo: "重做",
@@ -4374,6 +4377,75 @@ timeline
             }
         ];
 
+        const markdownSamples = [
+            {
+                name: { en: 'Bullet List', ja: '箇条書きリスト', zh: '无序列表' },
+                code: `- Item 1
+- Item 2
+  - Nested item 2.1
+  - Nested item 2.2
+- Item 3`
+            },
+            {
+                name: { en: 'Ordered List', ja: '番号付きリスト', zh: '有序列表' },
+                code: `1. First item
+2. Second item
+   1. Nested item 2.1
+   2. Nested item 2.2
+3. Third item`
+            },
+            {
+                name: { en: 'Code Block', ja: 'コードブロック', zh: '代码块' },
+                code: `\`\`\`javascript
+function greet(name) {
+    console.log(\`Hello, \${name}!\`);
+}
+greet('World');
+\`\`\``
+            },
+            {
+                name: { en: 'Blockquote', ja: '引用', zh: '引用块' },
+                code: `> This is a blockquote.
+> It can span multiple lines.
+>
+> > Nested blockquotes are also possible.`
+            },
+            {
+                name: { en: 'Table', ja: 'テーブル', zh: '表格' },
+                code: `| Header 1 | Header 2 | Header 3 |
+|----------|:--------:|---------:|
+| Left     | Center   | Right    |
+| Cell 1   | Cell 2   | Cell 3   |
+| Cell 4   | Cell 5   | Cell 6   |`
+            },
+            {
+                name: { en: 'Checkbox', ja: 'チェックボックス', zh: '复选框' },
+                code: `- [x] Completed task
+- [ ] Incomplete task
+- [ ] Another task
+  - [x] Nested completed
+  - [ ] Nested incomplete`
+            },
+            {
+                name: { en: 'Links', ja: 'リンク', zh: '链接' },
+                code: `[Inline link](https://example.com)
+
+[Link with title](https://example.com "Example Site")
+
+<https://example.com>
+
+[Reference link][ref]
+
+[ref]: https://example.com "Reference Example"`
+            },
+            {
+                name: { en: 'Image', ja: '画像', zh: '图片' },
+                code: `![Alt text](https://via.placeholder.com/150 "Image Title")
+
+[![Clickable Image](https://via.placeholder.com/100)](https://example.com)`
+            }
+        ];
+
         function openSampleModal() {
             const modal = document.getElementById('sample-modal');
             modal.classList.add('open');
@@ -4399,6 +4471,7 @@ timeline
         function renderSampleCards() {
             renderMermaidSamples();
             renderMathSamples();
+            renderMarkdownSamples();
         }
 
         async function renderMermaidSamples() {
@@ -4471,6 +4544,35 @@ timeline
             });
         }
 
+        function renderMarkdownSamples() {
+            const container = document.getElementById('markdown-samples');
+            container.innerHTML = '';
+
+            markdownSamples.forEach(sample => {
+                const card = document.createElement('div');
+                card.className = 'sample-card';
+                card.onclick = () => insertSample(sample.code);
+
+                const title = document.createElement('div');
+                title.className = 'sample-card-title';
+                title.textContent = sample.name[currentLang] || sample.name.en;
+
+                const preview = document.createElement('div');
+                preview.className = 'sample-card-preview markdown-preview';
+
+                // Render markdown preview
+                try {
+                    preview.innerHTML = marked.parse(sample.code);
+                } catch (e) {
+                    preview.textContent = sample.code;
+                }
+
+                card.appendChild(title);
+                card.appendChild(preview);
+                container.appendChild(card);
+            });
+        }
+
         function insertSample(code) {
             // Save state before change for undo
             saveState();
@@ -4531,6 +4633,9 @@ timeline
                 <button class="modal-tab" data-tab="math" onclick="switchSampleTab('math')">
                     <span data-i18n="mathFormulas">Math Formulas</span>
                 </button>
+                <button class="modal-tab" data-tab="markdown" onclick="switchSampleTab('markdown')">
+                    <span data-i18n="markdownItems">Markdown Items</span>
+                </button>
             </div>
             <div class="modal-body">
                 <div class="tab-content active" id="tab-mermaid">
@@ -4538,6 +4643,9 @@ timeline
                 </div>
                 <div class="tab-content" id="tab-math">
                     <div class="sample-grid" id="math-samples"></div>
+                </div>
+                <div class="tab-content" id="tab-markdown">
+                    <div class="sample-grid" id="markdown-samples"></div>
                 </div>
             </div>
         </div>

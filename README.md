@@ -136,6 +136,11 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📝 Changelog
 
+### v2.0.4
+- **Markdown Items Sample Tab**: Added new tab in Sample Code modal with common Markdown elements
+  - Bullet List, Ordered List, Code Block, Blockquote
+  - Table, Checkbox, Links, Image
+
 ### v2.0.3
 - Fix: Shift+Tab now works for outdenting selected lines
 - Fix: Indent size setting now defaults to 2 (was incorrectly fixed at 4)
